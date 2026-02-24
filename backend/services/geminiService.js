@@ -29,8 +29,25 @@ export async function identifyPlantByName(name) {
   If the input is not a plant at all, set identified to false.`;
 
   const result = await model.generateContent(prompt);
-  const text = result.response.text().replace(/\`\`\`json|\`\`\`/g, '').trim();
-  return JSON.parse(text);
+  const result = await model.generateContent(prompt);
+  let text = result.response.text();
+  
+  // Strip markdown code blocks if present
+  text = text.replace(/```json/g, '').replace(/```/g, '').trim();
+  
+  // Find JSON object boundaries in case there's extra text
+  const jsonStart = text.indexOf('{');
+  const jsonEnd = text.lastIndexOf('}');
+  if (jsonStart !== -1 && jsonEnd !== -1) {
+    text = text.slice(jsonStart, jsonEnd + 1);
+  }
+  
+  try {
+    return JSON.parse(text);
+  } catch (e) {
+    console.error('JSON parse failed, raw text:', text.slice(0, 500));
+    throw new Error('Failed to parse care guide from AI response');
+  }
 }
 
 export async function identifyPlantByImage(base64Image, mimeType = 'image/jpeg') {
@@ -53,8 +70,25 @@ export async function identifyPlantByImage(base64Image, mimeType = 'image/jpeg')
 
   const imagePart = { inlineData: { data: base64Image, mimeType } };
   const result = await model.generateContent([prompt, imagePart]);
-  const text = result.response.text().replace(/\`\`\`json|\`\`\`/g, '').trim();
-  return JSON.parse(text);
+  const result = await model.generateContent(prompt);
+  let text = result.response.text();
+  
+  // Strip markdown code blocks if present
+  text = text.replace(/```json/g, '').replace(/```/g, '').trim();
+  
+  // Find JSON object boundaries in case there's extra text
+  const jsonStart = text.indexOf('{');
+  const jsonEnd = text.lastIndexOf('}');
+  if (jsonStart !== -1 && jsonEnd !== -1) {
+    text = text.slice(jsonStart, jsonEnd + 1);
+  }
+  
+  try {
+    return JSON.parse(text);
+  } catch (e) {
+    console.error('JSON parse failed, raw text:', text.slice(0, 500));
+    throw new Error('Failed to parse care guide from AI response');
+  }
 }
 
 export async function generateCareGuide(plantName, scientificName) {
@@ -161,9 +195,25 @@ export async function generateCareGuide(plantName, scientificName) {
   }`;
 
   const result = await model.generateContent(prompt);
-  const text = result.response.text().replace(/\`\`\`json|\`\`\`/g, '').trim();
-  return JSON.parse(text);
-}
+  const result = await model.generateContent(prompt);
+  let text = result.response.text();
+  
+  // Strip markdown code blocks if present
+  text = text.replace(/```json/g, '').replace(/```/g, '').trim();
+  
+  // Find JSON object boundaries in case there's extra text
+  const jsonStart = text.indexOf('{');
+  const jsonEnd = text.lastIndexOf('}');
+  if (jsonStart !== -1 && jsonEnd !== -1) {
+    text = text.slice(jsonStart, jsonEnd + 1);
+  }
+  
+  try {
+    return JSON.parse(text);
+  } catch (e) {
+    console.error('JSON parse failed, raw text:', text.slice(0, 500));
+    throw new Error('Failed to parse care guide from AI response');
+  }
 
 export async function chatWithPlantExpert(plantData, chatHistory, userMessage, daysSinceAdded) {
   const model = getTextModel();
