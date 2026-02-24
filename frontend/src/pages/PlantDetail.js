@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getPlant, getChatHistory, sendChatMessage, getJournal, addJournalEntry, deleteJournalEntry, fileToBase64 } from '../lib/api';
+import Footer from '../components/Footer';
 
 const TABS = { CARE:'care', CHAT:'chat', JOURNAL:'journal' };
 
@@ -57,6 +58,7 @@ export default function PlantDetail() {
         {tab===TABS.CHAT&&<ChatTab plant={plant} userId={user.id}/>}
         {tab===TABS.JOURNAL&&<JournalTab plantId={plantId} userId={user.id}/>}
       </div>
+      <Footer />
     </div>
   );
 }

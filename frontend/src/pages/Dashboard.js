@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { getUserPlants, getNotifications, markAllNotificationsRead } from '../lib/api';
 import AddPlantModal from '../components/AddPlantModal';
 import NotificationPanel from '../components/NotificationPanel';
+import Footer from '../components/Footer';
 
 export default function Dashboard() {
   const { user, signOut } = useAuth();
@@ -87,6 +88,7 @@ export default function Dashboard() {
         <button style={{...s.bb,...s.ab}} onClick={()=>setShowAdd(true)}><span style={s.ai}>+</span></button>
         <button style={s.bb}><span>⚙️</span><span style={s.bl}>Settings</span></button>
       </div>
+      <Footer />
       {showAdd&&<AddPlantModal userId={user.id} onClose={()=>setShowAdd(false)} onPlantAdded={onPlantAdded}/>}
       {showNotifs&&<NotificationPanel notifications={notifications} userId={user.id} onClose={()=>setShowNotifs(false)} onMarkAllRead={()=>{markAllNotificationsRead(user.id);setNotifications([]);}}/>}
     </div>
