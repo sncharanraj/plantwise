@@ -6,12 +6,12 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 // Use gemini-2.0-flash-001 - stable, supports generateContent, no thinking mode
 export const getTextModel = () => genAI.getGenerativeModel({ 
-  model: 'gemini-2.0-flash-001',
+  model: 'gemini-2.0-flash-lite',
   generationConfig: { temperature: 0.3, responseMimeType: 'application/json' }
 });
 
 export const getVisionModel = () => genAI.getGenerativeModel({ 
-  model: 'gemini-2.0-flash-001',
+  model: 'gemini-2.0-flash-lite',
   generationConfig: { temperature: 0.3, responseMimeType: 'application/json' }
 });
 
@@ -138,7 +138,7 @@ Give specific, helpful, encouraging advice. Keep responses concise.`;
 
 // REMINDER MESSAGE
 export async function generateReminderMessage(plantName, reminderType, daysSince) {
-  const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-001' });
+  const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-lite' });
   const prompt = `Write a short friendly push notification (max 100 chars) to remind user to ${reminderType} their ${plantName}. ${daysSince} days have passed. No quotes.`;
   const result = await model.generateContent(prompt);
   return result.response.text().trim();
