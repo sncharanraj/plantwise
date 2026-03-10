@@ -10,15 +10,22 @@ async function request(endpoint, options = {}) {
   return data;
 }
 
-export const identifyByName = (name) => request('/identify/by-name', { method: 'POST', body: JSON.stringify({ name }) });
-export const identifyByImage = (image, mimeType) => request('/identify/by-image', { method: 'POST', body: JSON.stringify({ image, mimeType }) });
-export const generateCareGuide = (plantName, scientificName, plantId) => request('/care-guide/generate', { method: 'POST', body: JSON.stringify({ plantName, scientificName, plantId }) });
+export const identifyByName = (name) =>
+  request('/identify/by-name', { method: 'POST', body: JSON.stringify({ name }) });
+
+export const identifyByImage = (image, mimeType) =>
+  request('/identify/by-image', { method: 'POST', body: JSON.stringify({ image, mimeType }) });
+
+export const generateCareGuide = (plantName, scientificName, plantId) =>
+  request('/care-guide/generate', { method: 'POST', body: JSON.stringify({ plantName, scientificName, plantId }) });
+
 export const getUserPlants = (userId) => request(`/plants/user/${userId}`);
 export const getPlant = (plantId) => request(`/plants/${plantId}`);
 export const addPlant = (plantData) => request('/plants', { method: 'POST', body: JSON.stringify(plantData) });
 export const deletePlant = (plantId) => request(`/plants/${plantId}`, { method: 'DELETE' });
 export const updatePlant = (plantId, updates) => request(`/plants/${plantId}`, { method: 'PATCH', body: JSON.stringify(updates) });
-export const sendChatMessage = (plantId, message, userId) => request(`/chat/${plantId}/message`, { method: 'POST', body: JSON.stringify({ message, userId }) });
+export const sendChatMessage = (plantId, message, userId) =>
+  request(`/chat/${plantId}/message`, { method: 'POST', body: JSON.stringify({ message, userId }) });
 export const getChatHistory = (plantId) => request(`/chat/${plantId}/history`);
 export const getJournal = (plantId) => request(`/journal/${plantId}`);
 export const addJournalEntry = (entry) => request('/journal', { method: 'POST', body: JSON.stringify(entry) });
@@ -27,11 +34,33 @@ export const getNotifications = (userId) => request(`/notifications/user/${userI
 export const markNotificationRead = (notifId) => request(`/notifications/${notifId}/read`, { method: 'PATCH' });
 export const markAllNotificationsRead = (userId) => request(`/notifications/user/${userId}/read-all`, { method: 'PATCH' });
 
+// Convert any image file to JPEG base64 (handles WebP, PNG, HEIC etc.)
 export function fileToBase64(file) {
   return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result.split(',')[1]);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
+    const img = new Image();
+    const objectUrl = URL.createObjectURL(file);
+
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+      // Always output as JPEG for maximum compatibility
+      const base64 = canvas.toDataURL('image/jpeg', 0.9).split(',')[1];
+      URL.revokeObjectURL(objectUrl);
+      resolve(base64);
+    };
+
+    img.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      // Fallback to direct FileReader if canvas fails
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result.split(',')[1]);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    };
+
+    img.src = objectUrl;
   });
 }
