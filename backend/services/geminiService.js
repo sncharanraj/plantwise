@@ -77,7 +77,7 @@ If not a plant, set identified to false.`
 export async function identifyPlantByImage(base64Image, mimeType = 'image/jpeg') {
   // Use llama-3.2-11b-vision-preview for image support
   const body = {
-    model: 'llama-3.2-11b-vision-preview',
+    model: 'meta-llama/llama-4-scout-17b-16e-instruct',
     messages: [
       {
         role: 'user',
