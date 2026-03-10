@@ -3,25 +3,43 @@ import supabase from '../services/supabaseService.js';
 
 const router = express.Router();
 
-// Fetch a real plant image from Unsplash (free, no API key needed)
+// Fetch plant image using Wikimedia Commons (free, no API key, very reliable)
 async function fetchPlantImage(plantName, scientificName) {
   try {
-    const query = encodeURIComponent(scientificName || plantName);
-    const res = await fetch(
-      `https://source.unsplash.com/400x300/?${query},plant`,
-      { redirect: 'follow' }
-    );
-    if (res.ok && res.url && !res.url.includes('source.unsplash.com')) {
-      return res.url;
+    // Try scientific name first (more accurate)
+    const queries = [scientificName, plantName].filter(Boolean);
+
+    for (const query of queries) {
+      const encoded = encodeURIComponent(query);
+      const url = `https://en.wikipedia.org/api/rest_v1/page/summary/${encoded}`;
+      const res = await fetch(url, {
+        headers: { 'User-Agent': 'PlantWise/1.0 (plant care app)' }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.thumbnail?.source) {
+          // Get higher resolution version
+          const highRes = data.thumbnail.source.replace(/\/\d+px-/, '/400px-');
+          console.log(`Found Wikipedia image for "${query}": ${highRes}`);
+          return highRes;
+        }
+      }
     }
 
-    // Fallback: try with common name only
-    const res2 = await fetch(
-      `https://source.unsplash.com/400x300/?${encodeURIComponent(plantName)},plant`,
-      { redirect: 'follow' }
-    );
-    if (res2.ok && res2.url) return res2.url;
+    // Fallback: Wikimedia search
+    const searchUrl = `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(scientificName || plantName)}&prop=pageimages&format=json&pithumbsize=400&origin=*`;
+    const searchRes = await fetch(searchUrl);
+    if (searchRes.ok) {
+      const searchData = await searchRes.json();
+      const pages = Object.values(searchData.query?.pages || {});
+      const img = pages[0]?.thumbnail?.source;
+      if (img) {
+        console.log(`Found Wikimedia image: ${img}`);
+        return img;
+      }
+    }
 
+    console.log(`No image found for ${plantName}`);
     return null;
   } catch (e) {
     console.error('Image fetch error:', e.message);
@@ -67,9 +85,8 @@ router.post('/', async (req, res) => {
     // Auto-fetch plant image if none provided
     let finalImageUrl = imageUrl;
     if (!finalImageUrl) {
-      console.log(`Fetching image for ${plantName}...`);
+      console.log(`Fetching image for ${plantName} (${scientificName})...`);
       finalImageUrl = await fetchPlantImage(plantName, scientificName);
-      console.log(`Image URL: ${finalImageUrl}`);
     }
 
     const { data, error } = await supabase
@@ -123,11 +140,7 @@ router.post('/:plantId/refresh-image', async (req, res) => {
     const { plantName, scientificName } = req.body;
     const imageUrl = await fetchPlantImage(plantName, scientificName);
     if (!imageUrl) return res.status(404).json({ error: 'No image found' });
-
-    await supabase.from('user_plants')
-      .update({ image_url: imageUrl })
-      .eq('id', req.params.plantId);
-
+    await supabase.from('user_plants').update({ image_url: imageUrl }).eq('id', req.params.plantId);
     res.json({ success: true, imageUrl });
   } catch (err) {
     res.status(500).json({ error: 'Failed to refresh image' });
