@@ -64,3 +64,9 @@ export function fileToBase64(file) {
     img.src = objectUrl;
   });
 }
+
+export const refreshPlantImage = (plantId, plantName, scientificName) =>
+  request(`/plants/${plantId}/refresh-image`, { 
+    method: 'POST', 
+    body: JSON.stringify({ plantName, scientificName }) 
+  });
