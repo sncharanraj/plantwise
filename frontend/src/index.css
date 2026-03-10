@@ -107,3 +107,7 @@ body {
 
 .spinner { width:20px; height:20px; border:2.5px solid rgba(82,183,136,0.2); border-top-color:var(--mint); border-radius:50%; animation:spin 0.7s linear infinite; }
 .spinner-dark { border-color:rgba(82,183,136,0.2); border-top-color:var(--mint); }
+
+/* Plant card hover — show action buttons */
+.card:hover .card-actions { opacity: 1 !important; }
+.card:hover img { transform: scale(1.04); }
