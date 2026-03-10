@@ -5,6 +5,7 @@ import { getUserPlants, getNotifications, markAllNotificationsRead } from '../li
 import AddPlantModal from '../components/AddPlantModal';
 import NotificationPanel from '../components/NotificationPanel';
 import Footer from '../components/Footer';
+import SettingsPanel from '../components/SettingsPanel';
 
 export default function Dashboard() {
   const { user, signOut } = useAuth();
@@ -15,6 +16,7 @@ export default function Dashboard() {
   const [showAdd, setShowAdd] = useState(false);
   const [showNotifs, setShowNotifs] = useState(false);
   const [search, setSearch] = useState('');
+  const [showSettings, setShowSettings] = useState(false);
 
   useEffect(() => { if (user) { fetchPlants(); fetchNotifs(); } }, [user]);
 
@@ -86,12 +88,16 @@ export default function Dashboard() {
       <div style={s.bnav}>
         <button style={s.bb} onClick={()=>navigate('/')}><span>🏡</span><span style={s.bl}>Garden</span></button>
         <button style={{...s.bb,...s.ab}} onClick={()=>setShowAdd(true)}><span style={s.ai}>+</span></button>
-        <button style={s.bb}><span>⚙️</span><span style={s.bl}>Settings</span></button>
+        <button style={s.bb} onClick={()=>setShowSettings(true)}>
+  <span>⚙️</span>
+  <span style={s.bl}>Settings</span>
+</button>
       </div>
       <Footer />
       {showAdd&&<AddPlantModal userId={user.id} onClose={()=>setShowAdd(false)} onPlantAdded={onPlantAdded}/>}
       {showNotifs&&<NotificationPanel notifications={notifications} userId={user.id} onClose={()=>setShowNotifs(false)} onMarkAllRead={()=>{markAllNotificationsRead(user.id);setNotifications([]);}}/>}
-    </div>
+      {showSettings && <SettingsPanel onClose={()=>setShowSettings(false)} />}
+</div>
   );
 }
 
