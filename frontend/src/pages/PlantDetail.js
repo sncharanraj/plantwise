@@ -35,12 +35,12 @@ export default function PlantDetail() {
   }
 
   if(loading) return (
-    <div style={{display:'flex',alignItems:'center',justifyContent:'center',minHeight:'100vh',flexDirection:'column',gap:20,background:'var(--warm-white)'}}>
+    <div style={{display:'flex',alignItems:'center',justifyContent:'center',minHeight:'100vh',flexDirection:'column',gap:20,background:'var(--bg)'}}>
       <span style={{fontSize:48}}>🌿</span>
       <div className="spinner" style={{width:36,height:36}}/>
     </div>
   );
-  if(!plant) return <div style={{padding:40,textAlign:'center',color:'var(--text-dark)'}}>Plant not found</div>;
+  if(!plant) return <div style={{padding:40,textAlign:'center',color:'var(--text-1)'}}>Plant not found</div>;
 
   const dc = {Beginner:'badge-green',Intermediate:'badge-amber',Expert:'badge-red'};
   const LANG_LABELS = { en:'English', hi:'हिंदी', kn:'ಕನ್ನಡ' };
@@ -142,7 +142,7 @@ function CareTab({ cg, t }) {
   if (!cg) return (
     <div style={{textAlign:'center',padding:60}}>
       <div className="spinner" style={{width:32,height:32,margin:'0 auto 16px'}}/>
-      <p style={{color:'var(--text-light)'}}>{t.generatingCare||'Generating care guide...'}</p>
+      <p style={{color:'var(--text-3)'}}>{t.generatingCare||'Generating care guide...'}</p>
     </div>
   );
 
@@ -172,7 +172,7 @@ function CareTab({ cg, t }) {
       <div style={{display:'flex',flexDirection:'column',gap:10}}>
         {sec.data.map((p,i) => (
           <div key={i} style={det.pest}>
-            <p style={{fontWeight:700,fontSize:14,color:'var(--accent)',marginBottom:8}}>🐛 {p.pest}</p>
+            <p style={{fontWeight:700,fontSize:14,color:'var(--gold)',marginBottom:8}}>🐛 {p.pest}</p>
             {p.symptoms  && <div style={det.row}><span style={det.lbl}>{t.fSymptoms||'Symptoms'}</span><span style={det.val}>{p.symptoms}</span></div>}
             {p.treatment && <div style={det.row}><span style={det.lbl}>{t.fTreatment||'Treatment'}</span><span style={det.val}>{p.treatment}</span></div>}
           </div>
@@ -185,12 +185,12 @@ function CareTab({ cg, t }) {
         {sec.data.map((ti,i) => (
           <div key={i} style={{display:'flex',gap:14,marginBottom:18}}>
             <div style={{display:'flex',flexDirection:'column',alignItems:'center',flexShrink:0}}>
-              <div style={{width:12,height:12,borderRadius:'50%',background:'var(--mint)',border:'2px solid var(--sage)',flexShrink:0,marginTop:3}}/>
+              <div style={{width:12,height:12,borderRadius:'50%',background:'var(--olive-lite)',border:'2px solid var(--olive-mid)',flexShrink:0,marginTop:3}}/>
               {i < sec.data.length-1 && <div style={{width:2,flex:1,background:'var(--border)',marginTop:4,minHeight:20}}/>}
             </div>
             <div style={{paddingBottom:4}}>
-              <p style={{fontWeight:700,fontSize:13,color:'var(--mint)',marginBottom:3}}>{ti.period}</p>
-              <p style={{fontSize:14,color:'var(--text-mid)',lineHeight:1.6}}>{ti.expectation}</p>
+              <p style={{fontWeight:700,fontSize:13,color:'var(--olive-lite)',marginBottom:3}}>{ti.period}</p>
+              <p style={{fontSize:14,color:'var(--text-2)',lineHeight:1.6}}>{ti.expectation}</p>
             </div>
           </div>
         ))}
@@ -204,10 +204,10 @@ function CareTab({ cg, t }) {
         {sec.data.methods?.length > 0 && <div style={det.row}><span style={det.lbl}>{t.fMethods||'Methods'}</span><span style={det.val}>{sec.data.methods.join(', ')}</span></div>}
         {sec.data.steps?.length > 0 && (
           <div style={{marginTop:12}}>
-            <p style={{fontSize:12,color:'var(--text-light)',textTransform:'uppercase',letterSpacing:0.5,marginBottom:8}}>{t.fSteps||'Steps'}</p>
+            <p style={{fontSize:12,color:'var(--text-3)',textTransform:'uppercase',letterSpacing:0.5,marginBottom:8}}>{t.fSteps||'Steps'}</p>
             {sec.data.steps.map((step,i) => (
-              <p key={i} style={{fontSize:14,color:'var(--text-mid)',marginBottom:8,lineHeight:1.6}}>
-                <strong style={{color:'var(--mint)'}}>{i+1}. </strong>{step}
+              <p key={i} style={{fontSize:14,color:'var(--text-2)',marginBottom:8,lineHeight:1.6}}>
+                <strong style={{color:'var(--olive-lite)'}}>{i+1}. </strong>{step}
               </p>
             ))}
           </div>
@@ -334,7 +334,7 @@ function ChatTab({ plant, userId, t }) {
             {loading && (
               <div style={ch.row}>
                 <div style={ch.av}>🌿</div>
-                <div style={{...ch.bub,...ch.buba,color:'var(--text-light)',fontStyle:'italic'}} className="animate-pulse">{t.thinking||'Thinking...'}</div>
+                <div style={{...ch.bub,...ch.buba,color:'var(--text-3)',fontStyle:'italic'}} className="animate-pulse">{t.thinking||'Thinking...'}</div>
               </div>
             )}
             <div ref={endRef}/>
@@ -386,11 +386,11 @@ function JournalTab({ plantId, userId, t }) {
   return (
     <div style={{padding:'20px 0'}}>
       <div className="card animate-fadeUp" style={{padding:'20px 24px',marginBottom:24}}>
-        <h3 style={{fontFamily:'var(--font-display)',fontSize:18,fontWeight:600,marginBottom:14,color:'var(--mint)'}}>📝 {t.logToday||'Log Today'}</h3>
+        <h3 style={{fontFamily:'var(--font-display)',fontSize:18,fontWeight:600,marginBottom:14,color:'var(--olive-lite)'}}>📝 {t.logToday||'Log Today'}</h3>
         <textarea className="input" placeholder={t.journalPlaceholder||"What's happening with your plant today?"} value={note} onChange={e=>setNote(e.target.value)} rows={3} style={{resize:'vertical',marginBottom:12}}/>
         {imagePreview && <img src={imagePreview} alt="log" style={{width:'100%',maxHeight:180,objectFit:'cover',borderRadius:10,marginBottom:12}}/>}
         <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-          <label style={{fontSize:14,color:'var(--mint)',cursor:'pointer',fontWeight:500}}>📷 {t.addPhoto||'Add photo'}
+          <label style={{fontSize:14,color:'var(--olive-lite)',cursor:'pointer',fontWeight:500}}>📷 {t.addPhoto||'Add photo'}
             <input type="file" accept="image/*" style={{display:'none'}} onChange={e=>{const f=e.target.files[0];if(f){setImageFile(f);setImagePreview(URL.createObjectURL(f));}}}/>
           </label>
           <button className="btn btn-primary btn-sm" onClick={addEntry} disabled={saving||!note.trim()}>{saving?<span className="spinner"/>:(t.saveEntry||'Save Entry')}</button>
@@ -399,20 +399,20 @@ function JournalTab({ plantId, userId, t }) {
       {loading
         ? <div style={{textAlign:'center',padding:40}}><div className="spinner" style={{width:28,height:28,margin:'0 auto'}}/></div>
         : entries.length===0
-          ? <div style={{textAlign:'center',padding:60,color:'var(--text-light)'}}><p style={{fontSize:40,marginBottom:12}}>📓</p><p>{t.noEntries||'No entries yet. Start logging!'}</p></div>
+          ? <div style={{textAlign:'center',padding:60,color:'var(--text-3)'}}><p style={{fontSize:40,marginBottom:12}}>📓</p><p>{t.noEntries||'No entries yet. Start logging!'}</p></div>
           : <div style={{display:'flex',flexDirection:'column',gap:12}}>
             {entries.map(e => (
               <div key={e.id} style={{display:'flex',gap:14}} className="animate-fadeUp">
                 <div style={{display:'flex',flexDirection:'column',alignItems:'center',flexShrink:0,paddingTop:16}}>
-                  <div style={{width:10,height:10,borderRadius:'50%',background:'var(--mint)',border:'2px solid var(--sage)'}}/>
+                  <div style={{width:10,height:10,borderRadius:'50%',background:'var(--olive-lite)',border:'2px solid var(--olive-mid)'}}/>
                 </div>
-                <div style={{flex:1,background:'var(--card-bg)',border:'1px solid var(--border)',borderRadius:14,padding:'14px 18px'}}>
+                <div style={{flex:1,background:'var(--surface)',border:'1px solid var(--border)',borderRadius:14,padding:'14px 18px'}}>
                   <div style={{display:'flex',justifyContent:'space-between',marginBottom:8}}>
-                    <span style={{fontSize:12,color:'var(--text-light)',fontWeight:500}}>{new Date(e.logged_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</span>
-                    <button style={{background:'none',border:'none',cursor:'pointer',color:'var(--text-light)',fontSize:14}} onClick={()=>delEntry(e.id)}>✕</button>
+                    <span style={{fontSize:12,color:'var(--text-3)',fontWeight:500}}>{new Date(e.logged_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</span>
+                    <button style={{background:'none',border:'none',cursor:'pointer',color:'var(--text-3)',fontSize:14}} onClick={()=>delEntry(e.id)}>✕</button>
                   </div>
                   {e.image_url && <img src={e.image_url} alt="log" style={{width:'100%',maxHeight:200,objectFit:'cover',borderRadius:10,marginBottom:10}}/>}
-                  <p style={{fontSize:14,color:'var(--text-dark)',lineHeight:1.6}}>{e.note}</p>
+                  <p style={{fontSize:14,color:'var(--text-1)',lineHeight:1.6}}>{e.note}</p>
                 </div>
               </div>
             ))}
@@ -423,26 +423,26 @@ function JournalTab({ plantId, userId, t }) {
 }
 
 const s = {
-  page:  {minHeight:'100vh',background:'var(--warm-white)',paddingBottom:40},
+  page:  {minHeight:'100vh',background:'var(--bg)',paddingBottom:40},
   hdr:   {position:'relative',height:280},
   hbg:   {position:'absolute',inset:0},
   himg:  {width:'100%',height:'100%',objectFit:'cover'},
-  hph:   {width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center',background:'linear-gradient(135deg,var(--forest),var(--moss))'},
+  hph:   {width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center',background:'linear-gradient(135deg,var(--olive),var(--olive-mid))'},
   hov:   {position:'absolute',inset:0,background:'linear-gradient(to top,rgba(0,0,0,0.85),rgba(0,0,0,0.2) 60%,transparent)'},
   hcon:  {position:'absolute',inset:0,display:'flex',flexDirection:'column',justifyContent:'space-between',padding:'20px 24px'},
   back:  {background:'rgba(255,255,255,0.12)',backdropFilter:'blur(8px)',border:'1px solid rgba(255,255,255,0.15)',color:'white',padding:'8px 16px',borderRadius:100,cursor:'pointer',fontSize:14,alignSelf:'flex-start'},
   pname: {fontFamily:'var(--font-display)',fontSize:32,fontWeight:600,color:'white',textShadow:'0 2px 12px rgba(0,0,0,0.4)'},
   sci:   {fontStyle:'italic',color:'rgba(255,255,255,0.75)',fontSize:15,marginBottom:10},
   badges:{display:'flex',gap:8,flexWrap:'wrap'},
-  tabs:  {display:'flex',background:'var(--panel-bg)',borderBottom:'1px solid var(--border)',position:'sticky',top:0,zIndex:50},
-  tab:   {flex:1,padding:'14px 12px',background:'none',border:'none',cursor:'pointer',fontSize:14,fontWeight:500,color:'var(--text-light)',transition:'all 0.2s',borderBottom:'2px solid transparent',fontFamily:'var(--font-body)'},
-  taba:  {color:'var(--mint)',borderBottomColor:'var(--mint)',background:'rgba(82,183,136,0.06)'},
+  tabs:  {display:'flex',background:'var(--bg)',borderBottom:'1px solid var(--border)',position:'sticky',top:0,zIndex:50},
+  tab:   {flex:1,padding:'14px 12px',background:'none',border:'none',cursor:'pointer',fontSize:14,fontWeight:500,color:'var(--text-3)',transition:'all 0.2s',borderBottom:'2px solid transparent',fontFamily:'var(--font-body)'},
+  taba:  {color:'var(--olive-lite)',borderBottomColor:'var(--olive-lite)',background:'rgba(82,183,136,0.06)'},
   content:{maxWidth:800,margin:'0 auto',padding:'0 16px'},
 };
 const regen = {
   bar:{background:'rgba(82,183,136,0.07)',borderBottom:'1px solid rgba(82,183,136,0.15)',padding:'10px 24px',display:'flex',alignItems:'center',justifyContent:'space-between',gap:12,flexWrap:'wrap'},
-  msg:{fontSize:13,color:'var(--text-mid)'},
-  btn:{background:'rgba(82,183,136,0.15)',border:'1px solid rgba(82,183,136,0.3)',color:'var(--mint)',borderRadius:100,padding:'7px 16px',fontSize:13,fontWeight:600,cursor:'pointer',whiteSpace:'nowrap',transition:'all 0.2s'},
+  msg:{fontSize:13,color:'var(--text-2)'},
+  btn:{background:'rgba(82,183,136,0.15)',border:'1px solid rgba(82,183,136,0.3)',color:'var(--olive-lite)',borderRadius:100,padding:'7px 16px',fontSize:13,fontWeight:600,cursor:'pointer',whiteSpace:'nowrap',transition:'all 0.2s'},
 };
 const ov = {
   banner:{background:'linear-gradient(135deg,#1a4a35,#0d2a1d)',border:'1px solid rgba(82,183,136,0.2)',borderRadius:16,padding:'20px 24px',marginBottom:20,overflow:'hidden'},
@@ -451,23 +451,23 @@ const ov = {
 };
 const nav = {
   wrap:      {display:'flex',alignItems:'center',gap:4,marginBottom:16},
-  arr:       {background:'var(--card-bg)',border:'1px solid var(--border)',borderRadius:10,width:34,height:34,display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',fontSize:20,color:'var(--mint)',flexShrink:0,fontWeight:700,transition:'all 0.2s'},
+  arr:       {background:'var(--surface)',border:'1px solid var(--border)',borderRadius:10,width:34,height:34,display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',fontSize:20,color:'var(--olive-lite)',flexShrink:0,fontWeight:700,transition:'all 0.2s'},
   scroll:    {display:'flex',gap:8,overflowX:'auto',flex:1,scrollbarWidth:'none',msOverflowStyle:'none',paddingBottom:2},
-  chip:      {display:'flex',flexDirection:'column',alignItems:'center',gap:3,padding:'10px 14px',borderRadius:14,border:'1px solid var(--border)',background:'var(--card-bg)',cursor:'pointer',minWidth:80,flexShrink:0,transition:'all 0.2s',textAlign:'center'},
-  chipActive:{border:'1px solid var(--mint)',background:'rgba(82,183,136,0.12)',boxShadow:'0 0 0 1px rgba(82,183,136,0.2)'},
-  chipLabel: {fontSize:12,fontWeight:600,color:'var(--text-dark)',whiteSpace:'nowrap'},
-  chipSub:   {fontSize:11,color:'var(--text-light)',whiteSpace:'nowrap',maxWidth:80,overflow:'hidden',textOverflow:'ellipsis'},
+  chip:      {display:'flex',flexDirection:'column',alignItems:'center',gap:3,padding:'10px 14px',borderRadius:14,border:'1px solid var(--border)',background:'var(--surface)',cursor:'pointer',minWidth:80,flexShrink:0,transition:'all 0.2s',textAlign:'center'},
+  chipActive:{border:'1px solid var(--olive-lite)',background:'rgba(82,183,136,0.12)',boxShadow:'0 0 0 1px rgba(82,183,136,0.2)'},
+  chipLabel: {fontSize:12,fontWeight:600,color:'var(--text-1)',whiteSpace:'nowrap'},
+  chipSub:   {fontSize:11,color:'var(--text-3)',whiteSpace:'nowrap',maxWidth:80,overflow:'hidden',textOverflow:'ellipsis'},
 };
 const det = {
-  panel: {background:'var(--card-bg)',border:'1px solid var(--border-strong)',borderRadius:16,padding:'20px 22px',animation:'fadeUp 0.25s ease forwards'},
+  panel: {background:'var(--surface)',border:'1px solid var(--border-mid)',borderRadius:16,padding:'20px 22px',animation:'fadeUp 0.25s ease forwards'},
   hdr:   {display:'flex',alignItems:'center',gap:12},
   iconWrap:{width:40,height:40,borderRadius:12,background:'rgba(82,183,136,0.12)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:20,flexShrink:0},
-  title: {fontFamily:'var(--font-display)',fontSize:18,fontWeight:600,color:'var(--text-dark)'},
-  sub:   {fontSize:13,color:'var(--text-light)',marginTop:2},
+  title: {fontFamily:'var(--font-display)',fontSize:18,fontWeight:600,color:'var(--text-1)'},
+  sub:   {fontSize:13,color:'var(--text-3)',marginTop:2},
   row:   {display:'flex',justifyContent:'space-between',padding:'9px 0',borderBottom:'1px solid rgba(82,183,136,0.06)',gap:16},
-  lbl:   {fontSize:13,color:'var(--text-light)',flexShrink:0,textTransform:'capitalize'},
-  val:   {fontSize:13,color:'var(--text-dark)',textAlign:'right',lineHeight:1.5},
-  tip:   {background:'rgba(82,183,136,0.08)',border:'1px solid rgba(82,183,136,0.15)',borderRadius:10,padding:'10px 14px',fontSize:13,color:'var(--text-mid)',marginTop:10,lineHeight:1.6},
+  lbl:   {fontSize:13,color:'var(--text-3)',flexShrink:0,textTransform:'capitalize'},
+  val:   {fontSize:13,color:'var(--text-1)',textAlign:'right',lineHeight:1.5},
+  tip:   {background:'rgba(82,183,136,0.08)',border:'1px solid rgba(82,183,136,0.15)',borderRadius:10,padding:'10px 14px',fontSize:13,color:'var(--text-2)',marginTop:10,lineHeight:1.6},
   prob:  {background:'rgba(224,92,75,0.06)',border:'1px solid rgba(224,92,75,0.12)',borderRadius:10,padding:'12px 14px'},
   pest:  {background:'rgba(212,168,67,0.06)',border:'1px solid rgba(212,168,67,0.12)',borderRadius:10,padding:'12px 14px'},
 };
@@ -476,11 +476,11 @@ const ch = {
   msgs: {flex:1,overflow:'auto',padding:'16px 0',display:'flex',flexDirection:'column',gap:14},
   row:  {display:'flex',gap:10,alignItems:'flex-start'},
   rowu: {flexDirection:'row-reverse'},
-  av:   {width:32,height:32,borderRadius:'50%',background:'linear-gradient(135deg,var(--sage),var(--mint))',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,fontSize:16},
+  av:   {width:32,height:32,borderRadius:'50%',background:'linear-gradient(135deg,var(--olive-mid),var(--olive-lite))',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,fontSize:16},
   bub:  {maxWidth:'75%',padding:'12px 16px',borderRadius:18,fontSize:15,lineHeight:1.6},
-  buba: {background:'var(--card-bg)',border:'1px solid var(--border)',borderTopLeftRadius:4,color:'var(--text-dark)'},
-  bubu: {background:'linear-gradient(135deg,var(--sage),var(--mint))',color:'var(--forest)',fontWeight:500,borderTopRightRadius:4},
+  buba: {background:'var(--surface)',border:'1px solid var(--border)',borderTopLeftRadius:4,color:'var(--text-1)'},
+  bubu: {background:'linear-gradient(135deg,var(--olive-mid),var(--olive-lite))',color:'var(--olive)',fontWeight:500,borderTopRightRadius:4},
   sugg: {display:'flex',gap:8,flexWrap:'wrap',padding:'10px 0'},
-  sb:   {background:'var(--card-bg)',border:'1px solid var(--border)',borderRadius:100,padding:'8px 14px',fontSize:13,cursor:'pointer',color:'var(--text-mid)'},
+  sb:   {background:'var(--surface)',border:'1px solid var(--border)',borderRadius:100,padding:'8px 14px',fontSize:13,cursor:'pointer',color:'var(--text-2)'},
   ir:   {display:'flex',gap:10,padding:'14px 0 8px'},
 };
