@@ -1,19 +1,22 @@
+import { useLanguage } from '../context/LanguageContext';
 import { markNotificationRead } from '../lib/api';
 
 export default function NotificationPanel({ notifications, userId, onClose, onMarkAllRead }) {
+  const { t } = useLanguage();
   const icon = { watering:'💧', fertilizing:'🌿', repotting:'🪴' };
+
   return (
     <div style={s.overlay} onClick={e=>e.target===e.currentTarget&&onClose()}>
       <div style={s.panel} className="animate-growIn">
         <div style={s.hdr}>
-          <h2 style={s.ttl}>Reminders</h2>
+          <h2 style={s.ttl}>{t.reminders}</h2>
           <div style={{display:'flex',gap:12,alignItems:'center'}}>
-            {notifications.length>0&&<button className="btn btn-ghost btn-sm" onClick={onMarkAllRead}>Mark all read</button>}
+            {notifications.length>0&&<button className="btn btn-ghost btn-sm" onClick={onMarkAllRead}>{t.markAllRead}</button>}
             <button style={s.cls} onClick={onClose}>✕</button>
           </div>
         </div>
         {notifications.length===0?(
-          <div style={s.empty}><p style={{fontSize:36,marginBottom:12}}>✅</p><p style={{color:'var(--text-light)'}}>All caught up!</p></div>
+          <div style={s.empty}><p style={{fontSize:36,marginBottom:12}}>✅</p><p style={{color:'var(--text-light)'}}>{t.allCaughtUp}</p></div>
         ):(
           <div style={s.list}>
             {notifications.map(n=>(
@@ -45,5 +48,5 @@ const s = {
   ico:{fontSize:24,flexShrink:0},
   msg:{fontSize:14,color:'var(--text-dark)',lineHeight:1.5,marginBottom:4},
   time:{fontSize:12,color:'var(--text-light)'},
-  rb:{background:'var(--cream)',border:'none',borderRadius:'50%',width:28,height:28,cursor:'pointer',color:'var(--sage)',fontWeight:700,flexShrink:0}
+  rb:{background:'var(--cream)',border:'none',borderRadius:'50%',width:28,height:28,cursor:'pointer',color:'var(--sage)',fontWeight:700,flexShrink:0},
 };

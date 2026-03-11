@@ -1,9 +1,11 @@
 import { useState } from 'react';
+import { useLanguage } from '../context/LanguageContext';
 import { identifyByName, identifyByImage, addPlant, generateCareGuide, fileToBase64 } from '../lib/api';
 
 const STEPS = { METHOD:'method', INPUT:'input', CONFIRM:'confirm', LOADING:'loading' };
 
 export default function AddPlantModal({ userId, onClose, onPlantAdded }) {
+  const { t } = useLanguage();
   const [step, setStep] = useState(STEPS.METHOD);
   const [method, setMethod] = useState(null);
   const [plantName, setPlantName] = useState('');
@@ -29,18 +31,18 @@ export default function AddPlantModal({ userId, onClose, onPlantAdded }) {
     try {
       let res;
       if (method === 'name') {
-        if (!plantName.trim()) { setError('Please enter a plant name'); setLoading(false); return; }
+        if (!plantName.trim()) { setError(t.pleaseEnterName); setLoading(false); return; }
         res = await identifyByName(plantName);
       } else {
-        if (!imageFile) { setError('Please select an image'); setLoading(false); return; }
+        if (!imageFile) { setError(t.pleaseSelectImage); setLoading(false); return; }
         const base64 = await fileToBase64(imageFile);
         res = await identifyByImage(base64, imageFile.type);
       }
-      if (!res.data.identified) { setError('Could not identify this plant. Please try again.'); setLoading(false); return; }
+      if (!res.data.identified) { setError(t.couldNotIdentify); setLoading(false); return; }
       setIdentified(res.data);
       setSelectedAlt(null);
       setStep(STEPS.CONFIRM);
-    } catch (err) { setError(err.message || 'Identification failed'); }
+    } catch (err) { setError(err.message || t.couldNotIdentify); }
     finally { setLoading(false); }
   }
 
@@ -48,31 +50,32 @@ export default function AddPlantModal({ userId, onClose, onPlantAdded }) {
     const plant = selectedAlt || identified;
     setStep(STEPS.LOADING);
     try {
-      setStatusMsg('Adding plant to your garden...');
+      setStatusMsg(t.addingPlant);
       const newPlant = await addPlant({ userId, plantName: plant.commonName, scientificName: plant.scientificName, family: plant.family, identifiedVia: method });
-      setStatusMsg('Generating AI care guide...');
+      setStatusMsg(t.generatingAI);
       await generateCareGuide(plant.commonName, plant.scientificName, newPlant.data.id);
       onPlantAdded({ ...newPlant.data, plant_name: plant.commonName, days_growing: 0 });
     } catch (err) { setError(err.message); setStep(STEPS.CONFIRM); }
   }
 
   const confColor = (c) => c>=85?'rgba(39,174,96,0.15)':c>=65?'rgba(243,156,18,0.15)':'rgba(192,57,43,0.1)';
+  const stepTitle = step===STEPS.METHOD ? t.addPlantTitle : step===STEPS.INPUT ? t.identifyPlantStep : step===STEPS.CONFIRM ? t.confirmPlantStep : t.settingUp;
 
   return (
     <div style={s.overlay} onClick={e=>e.target===e.currentTarget&&onClose()}>
       <div style={s.modal} className="animate-growIn">
         <div style={s.hdr}>
-          <h2 style={s.ttl}>{step===STEPS.METHOD?'Add a Plant':step===STEPS.INPUT?'Identify Plant':step===STEPS.CONFIRM?'Confirm Plant':'Setting Up...'}</h2>
+          <h2 style={s.ttl}>{stepTitle}</h2>
           {step!==STEPS.LOADING&&<button style={s.cls} onClick={onClose}>✕</button>}
         </div>
         <div style={s.prog}>{[STEPS.METHOD,STEPS.INPUT,STEPS.CONFIRM].map(s2=><div key={s2} style={{...s.dot,...(step===s2||step===STEPS.LOADING&&s2===STEPS.CONFIRM?s.dotA:{})}}/>)}</div>
 
         {step===STEPS.METHOD&&(
           <div style={s.body}>
-            <p style={s.sub}>How would you like to identify your plant?</p>
+            <p style={s.sub}>{t.howToIdentify}</p>
             <div style={s.mgrid}>
-              <button style={s.mc} onClick={()=>selectMethod('name')}><span style={s.mi}>🔤</span><h3 style={s.mt}>By Name</h3><p style={s.md}>Type the plant name</p></button>
-              <button style={s.mc} onClick={()=>selectMethod('image')}><span style={s.mi}>📷</span><h3 style={s.mt}>By Photo</h3><p style={s.md}>Upload a plant photo</p></button>
+              <button style={s.mc} onClick={()=>selectMethod('name')}><span style={s.mi}>🔤</span><h3 style={s.mt}>{t.byName}</h3><p style={s.md}>{t.byNameDesc}</p></button>
+              <button style={s.mc} onClick={()=>selectMethod('image')}><span style={s.mi}>📷</span><h3 style={s.mt}>{t.byPhoto}</h3><p style={s.md}>{t.byPhotoDesc}</p></button>
             </div>
           </div>
         )}
@@ -82,22 +85,22 @@ export default function AddPlantModal({ userId, onClose, onPlantAdded }) {
             {error&&<div style={s.err}>{error}</div>}
             {method==='name'?(
               <>
-                <p style={s.sub}>Enter the plant name as you know it</p>
-                <input className="input" placeholder="e.g. Monstera, Tulsi, Money Plant..." value={plantName} onChange={e=>setPlantName(e.target.value)} onKeyDown={e=>e.key==='Enter'&&handleIdentify()} autoFocus style={{marginBottom:20}}/>
+                <p style={s.sub}>{t.enterPlantName}</p>
+                <input className="input" placeholder={t.plantNamePlaceholder} value={plantName} onChange={e=>setPlantName(e.target.value)} onKeyDown={e=>e.key==='Enter'&&handleIdentify()} autoFocus style={{marginBottom:20}}/>
               </>
             ):(
               <>
-                <p style={s.sub}>Upload a clear photo of the plant</p>
+                <p style={s.sub}>{t.uploadPhoto}</p>
                 <div style={s.dz} onClick={()=>document.getElementById('pimg').click()}>
-                  {imagePreview?<img src={imagePreview} alt="plant" style={s.prev}/>:<><span style={{fontSize:40}}>📸</span><p style={{color:'var(--text-mid)',marginTop:12}}>Click to select photo</p></>}
+                  {imagePreview?<img src={imagePreview} alt="plant" style={s.prev}/>:<><span style={{fontSize:40}}>📸</span><p style={{color:'var(--text-mid)',marginTop:12}}>{t.clickToSelect}</p></>}
                   <input id="pimg" type="file" accept="image/*" style={{display:'none'}} onChange={handleImageSelect}/>
                 </div>
               </>
             )}
             <div style={s.br}>
-              <button className="btn btn-secondary" onClick={()=>{setStep(STEPS.METHOD);setError('');}}>← Back</button>
+              <button className="btn btn-secondary" onClick={()=>{setStep(STEPS.METHOD);setError('');}}>{t.back}</button>
               <button className="btn btn-primary" onClick={handleIdentify} disabled={loading}>
-                {loading?<><span className="spinner"/> Identifying...</>:'Identify Plant →'}
+                {loading?<><span className="spinner"/> {t.identifyingPlant}</>:t.identifyBtn}
               </button>
             </div>
           </div>
@@ -106,7 +109,7 @@ export default function AddPlantModal({ userId, onClose, onPlantAdded }) {
         {step===STEPS.CONFIRM&&identified&&(
           <div style={s.body}>
             {error&&<div style={s.err}>{error}</div>}
-            <p style={s.sub}>Is this the correct plant?</p>
+            <p style={s.sub}>{t.isThisCorrect}</p>
             <div style={{...s.rc,...(selectedAlt===null?s.rcs:{})}} onClick={()=>setSelectedAlt(null)}>
               <div style={s.rl}>
                 {selectedAlt===null&&<span style={s.ck}>✓</span>}
@@ -116,7 +119,7 @@ export default function AddPlantModal({ userId, onClose, onPlantAdded }) {
             </div>
             {identified.note&&<p style={s.note}>💬 {identified.note}</p>}
             {identified.alternatives?.length>0&&(
-              <>{<p style={s.al}>Or did you mean?</p>}{identified.alternatives.map((alt,i)=>(
+              <>{<p style={s.al}>{t.orDidYouMean}</p>}{identified.alternatives.map((alt,i)=>(
                 <div key={i} style={{...s.rc,...s.ac,...(selectedAlt===alt?s.rcs:{})}} onClick={()=>setSelectedAlt(alt)}>
                   <div style={s.rl}>
                     {selectedAlt===alt&&<span style={s.ck}>✓</span>}
@@ -127,8 +130,8 @@ export default function AddPlantModal({ userId, onClose, onPlantAdded }) {
               ))}</>
             )}
             <div style={s.br}>
-              <button className="btn btn-secondary" onClick={()=>{setStep(STEPS.INPUT);setError('');}}>← Try again</button>
-              <button className="btn btn-primary" onClick={handleConfirm}>✓ Add to Garden</button>
+              <button className="btn btn-secondary" onClick={()=>{setStep(STEPS.INPUT);setError('');}}>{t.tryAgain}</button>
+              <button className="btn btn-primary" onClick={handleConfirm}>{t.addToGarden}</button>
             </div>
           </div>
         )}
@@ -140,7 +143,7 @@ export default function AddPlantModal({ userId, onClose, onPlantAdded }) {
             <div style={{height:4,background:'var(--border)',borderRadius:2,overflow:'hidden',maxWidth:300,margin:'0 auto 16px'}}>
               <div className="animate-pulse" style={{height:'100%',width:'70%',background:'linear-gradient(90deg,var(--sage),var(--mint))',borderRadius:2}}/>
             </div>
-            <p style={{color:'var(--text-light)',fontSize:14}}>Generating complete care guide with Gemini AI...</p>
+            <p style={{color:'var(--text-light)',fontSize:14}}>{t.generatingAINote}</p>
           </div>
         )}
       </div>
