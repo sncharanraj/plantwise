@@ -289,13 +289,60 @@ const translations = {
 };
 
 const LanguageContext = createContext();
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
 export function LanguageProvider({ children }) {
   const [lang, setLang] = useState(() => localStorage.getItem('pw_lang') || 'en');
-  function switchLang(l) { setLang(l); localStorage.setItem('pw_lang', l); }
+  // nameCache: { 'hi': { 'Sunflower': 'सूरजमुखी', ... }, 'kn': { ... } }
+  const [nameCache, setNameCache] = useState({});
+  const [translatingNames, setTranslatingNames] = useState(false);
+
   const t = translations[lang] || translations.en;
+
+  async function switchLang(l) {
+    setLang(l);
+    localStorage.setItem('pw_lang', l);
+  }
+
+  // Call this from Dashboard after plants are loaded, whenever lang changes
+  async function translateNames(englishNames) {
+    if (lang === 'en') return;
+    if (!englishNames?.length) return;
+
+    // Filter names not yet cached for current lang
+    const cached = nameCache[lang] || {};
+    const missing = englishNames.filter(n => !cached[n]);
+    if (!missing.length) return;
+
+    setTranslatingNames(true);
+    try {
+      const res = await fetch(`${API_URL}/plants/translate-names`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ names: missing, lang })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setNameCache(prev => ({
+          ...prev,
+          [lang]: { ...(prev[lang] || {}), ...data.data }
+        }));
+      }
+    } catch(e) {
+      console.error('Name translation failed:', e);
+    } finally {
+      setTranslatingNames(false);
+    }
+  }
+
+  // Translate a single name — returns translated or original
+  function tn(englishName) {
+    if (lang === 'en' || !englishName) return englishName;
+    return (nameCache[lang] || {})[englishName] || englishName;
+  }
+
   return (
-    <LanguageContext.Provider value={{ lang, switchLang, t }}>
+    <LanguageContext.Provider value={{ lang, switchLang, t, tn, translateNames, translatingNames }}>
       {children}
     </LanguageContext.Provider>
   );

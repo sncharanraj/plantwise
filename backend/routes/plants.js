@@ -1,5 +1,6 @@
 import express from 'express';
 import supabase from '../services/supabaseService.js';
+import { translatePlantNames } from '../services/geminiService.js';
 
 const router = express.Router();
 
@@ -144,6 +145,22 @@ router.post('/:plantId/refresh-image', async (req, res) => {
     res.json({ success: true, imageUrl });
   } catch (err) {
     res.status(500).json({ error: 'Failed to refresh image' });
+  }
+});
+
+router.post('/translate-names', async (req, res) => {
+  try {
+    const { names, lang } = req.body;
+    if (!names || !Array.isArray(names) || !lang) {
+      return res.status(400).json({ error: 'names (array) and lang required' });
+    }
+    if (lang === 'en') return res.json({ success: true, data: {} });
+    const { translatePlantNames } = await import('../services/geminiService.js');
+    const translations = await translatePlantNames(names, lang);
+    res.json({ success: true, data: translations });
+  } catch (err) {
+    console.error('Translate names error:', err);
+    res.status(500).json({ error: 'Translation failed' });
   }
 });
 

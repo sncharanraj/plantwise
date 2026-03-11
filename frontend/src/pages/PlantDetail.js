@@ -10,7 +10,7 @@ const TABS = { CARE:'care', CHAT:'chat', JOURNAL:'journal' };
 export default function PlantDetail() {
   const { plantId } = useParams();
   const { user } = useAuth();
-  const { lang, t } = useLanguage();
+  const { lang, t, tn } = useLanguage();
   const navigate = useNavigate();
   const [plant, setPlant] = useState(null);
   const [tab, setTab] = useState(TABS.CARE);
@@ -58,7 +58,7 @@ export default function PlantDetail() {
         <div style={s.hcon}>
           <button style={s.back} onClick={() => navigate('/')}>← {t.back||'Back'}</button>
           <div>
-            <h1 style={s.pname}>{plant.plant_name}</h1>
+            <h1 style={s.pname}>{tn(plant.plant_name)}</h1>
             {plant.scientific_name && <p style={s.sci}>{plant.scientific_name}</p>}
             <div style={s.badges}>
               <span className="badge badge-green">{plant.days_growing} {t.daysGrowing||'days growing'}</span>

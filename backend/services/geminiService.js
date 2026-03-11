@@ -180,3 +180,23 @@ export async function generateReminderMessage(plantName, reminderType, daysSince
   }], false);
   return text.trim();
 }
+
+// ─── BATCH TRANSLATE PLANT NAMES ───────────────────────────────────────────
+export async function translatePlantNames(names, lang = 'en') {
+  if (lang === 'en') return {};
+  const langName = LANG_NAMES[lang] || 'English';
+  const text = await callGroq([
+    {
+      role: 'system',
+      content: `You are a botanist. Translate common plant names to ${langName}. Respond ONLY with a valid JSON object mapping each English name to its ${langName} translation. Keep it natural and commonly used. Example: {"Rose":"ಗುಲಾಬಿ","Tulip":"ಟ್ಯೂಲಿಪ್"}`
+    },
+    {
+      role: 'user',
+      content: `Translate these plant names to ${langName}: ${JSON.stringify(names)}`
+    }
+  ], false);
+  try {
+    const clean = text.replace(/```json|```/g, '').trim();
+    return JSON.parse(clean);
+  } catch(e) { return {}; }
+}
