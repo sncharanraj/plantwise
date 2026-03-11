@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { LanguageProvider } from './context/LanguageContext';
+import { ThemeProvider } from './context/ThemeContext';
 import AuthPage from './pages/AuthPage';
 import Dashboard from './pages/Dashboard';
 import PlantDetail from './pages/PlantDetail';
@@ -10,9 +11,9 @@ function AppRoutes() {
   const { user, loading } = useAuth();
   if (loading) {
     return (
-      <div style={{ display:'flex', alignItems:'center', justifyContent:'center', minHeight:'100vh', flexDirection:'column', gap:20 }}>
-        <span style={{ fontSize:48 }}>🌱</span>
-        <div style={{ width:32, height:32, border:'3px solid rgba(82,183,136,0.2)', borderTopColor:'var(--mint)', borderRadius:'50%', animation:'spin 0.7s linear infinite' }} />
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'center', minHeight:'100vh', flexDirection:'column', gap:20, background:'var(--bg)' }}>
+        <span style={{ fontSize:48 }}>🌻</span>
+        <div style={{ width:32, height:32, border:'3px solid var(--border-mid)', borderTopColor:'var(--olive-mid)', borderRadius:'50%', animation:'spin 0.7s linear infinite' }} />
       </div>
     );
   }
@@ -28,12 +29,14 @@ function AppRoutes() {
 
 export default function App() {
   return (
-    <LanguageProvider>
-      <AuthProvider>
-        <BrowserRouter>
-          <AppRoutes />
-        </BrowserRouter>
-      </AuthProvider>
-    </LanguageProvider>
+    <ThemeProvider>
+      <LanguageProvider>
+        <AuthProvider>
+          <BrowserRouter>
+            <AppRoutes />
+          </BrowserRouter>
+        </AuthProvider>
+      </LanguageProvider>
+    </ThemeProvider>
   );
 }
