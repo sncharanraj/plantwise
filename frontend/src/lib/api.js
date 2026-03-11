@@ -1,72 +1,80 @@
-const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+import express from 'express';
+import supabase from '../services/supabaseService.js';
 
-async function request(endpoint, options = {}) {
-  const res = await fetch(`${API_BASE}${endpoint}`, {
-    headers: { 'Content-Type': 'application/json', ...options.headers },
-    ...options
-  });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || 'Request failed');
-  return data;
-}
+const router = express.Router();
 
-export const identifyByName = (name) =>
-  request('/identify/by-name', { method: 'POST', body: JSON.stringify({ name }) });
+router.post('/:plantId/message', async (req, res) => {
+  try {
+    const { plantId } = req.params;
+    const { message, userId, lang = 'en' } = req.body;
 
-export const identifyByImage = (image, mimeType) =>
-  request('/identify/by-image', { method: 'POST', body: JSON.stringify({ image, mimeType }) });
+    console.log('Chat request:', { plantId, userId, lang, message: message?.slice(0, 50) });
 
-export const generateCareGuide = (plantName, scientificName, plantId) =>
-  request('/care-guide/generate', { method: 'POST', body: JSON.stringify({ plantName, scientificName, plantId }) });
+    if (!message || !userId) return res.status(400).json({ error: 'message and userId are required' });
 
-export const getUserPlants = (userId) => request(`/plants/user/${userId}`);
-export const getPlant = (plantId) => request(`/plants/${plantId}`);
-export const addPlant = (plantData) => request('/plants', { method: 'POST', body: JSON.stringify(plantData) });
-export const deletePlant = (plantId) => request(`/plants/${plantId}`, { method: 'DELETE' });
-export const updatePlant = (plantId, updates) => request(`/plants/${plantId}`, { method: 'PATCH', body: JSON.stringify(updates) });
-export const sendChatMessage = (plantId, message, userId) =>
-  request(`/chat/${plantId}/message`, { method: 'POST', body: JSON.stringify({ message, userId }) });
-export const getChatHistory = (plantId) => request(`/chat/${plantId}/history`);
-export const getJournal = (plantId) => request(`/journal/${plantId}`);
-export const addJournalEntry = (entry) => request('/journal', { method: 'POST', body: JSON.stringify(entry) });
-export const deleteJournalEntry = (entryId) => request(`/journal/${entryId}`, { method: 'DELETE' });
-export const getNotifications = (userId) => request(`/notifications/user/${userId}`);
-export const markNotificationRead = (notifId) => request(`/notifications/${notifId}/read`, { method: 'PATCH' });
-export const markAllNotificationsRead = (userId) => request(`/notifications/user/${userId}/read-all`, { method: 'PATCH' });
+    const { data: plant, error: plantError } = await supabase
+      .from('user_plants').select('*').eq('id', plantId).single();
+    if (plantError) return res.status(404).json({ error: 'Plant not found' });
 
-// Convert any image file to JPEG base64 (handles WebP, PNG, HEIC etc.)
-export function fileToBase64(file) {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    const objectUrl = URL.createObjectURL(file);
+    const daysSinceAdded = Math.floor((new Date() - new Date(plant.created_at)) / (1000 * 60 * 60 * 24));
 
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      canvas.width = img.naturalWidth;
-      canvas.height = img.naturalHeight;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0);
-      // Always output as JPEG for maximum compatibility
-      const base64 = canvas.toDataURL('image/jpeg', 0.9).split(',')[1];
-      URL.revokeObjectURL(objectUrl);
-      resolve(base64);
-    };
+    let aiResponse;
+    try {
+      const { chatWithPlantExpert } = await import('../services/geminiService.js');
+      const { data: chatHistory } = await supabase.from('plant_chats').select('role, message')
+        .eq('plant_id', plantId).order('created_at', { ascending: true }).limit(20);
+      const { data: journalEntries } = await supabase.from('growth_logs').select('note, logged_at')
+        .eq('plant_id', plantId).order('logged_at', { ascending: false }).limit(5);
 
-    img.onerror = () => {
-      URL.revokeObjectURL(objectUrl);
-      // Fallback to direct FileReader if canvas fails
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result.split(',')[1]);
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    };
+      aiResponse = await chatWithPlantExpert(
+        { ...plant, journal_entries: journalEntries || [] },
+        chatHistory || [],
+        message,
+        daysSinceAdded,
+        lang
+      );
+    } catch (aiError) {
+      console.error('AI failed, using fallback:', aiError.message);
+      const cg = plant.care_guide;
+      const lowerMsg = message.toLowerCase();
+      if (lowerMsg.includes('water') || lowerMsg.includes('पानी') || lowerMsg.includes('ನೀರು')) {
+        aiResponse = `💧 ${cg?.watering?.frequency || 'Check care guide'}. ${cg?.watering?.tips || ''}`;
+      } else if (lowerMsg.includes('light') || lowerMsg.includes('sun') || lowerMsg.includes('ಬೆಳಕು') || lowerMsg.includes('धूप')) {
+        aiResponse = `☀️ ${cg?.sunlight?.requirement || 'Check care guide'}. ${cg?.sunlight?.tips || ''}`;
+      } else if (lowerMsg.includes('yellow') || lowerMsg.includes('problem') || lowerMsg.includes('ಹಳದಿ') || lowerMsg.includes('पीला')) {
+        const p = cg?.commonProblems?.[0];
+        aiResponse = p ? `⚠️ ${p.problem} — ${p.solution}` : `Check the Care Guide for common problems.`;
+      } else {
+        aiResponse = `🌱 ${cg?.overview || `Your ${plant.plant_name} has been growing for ${daysSinceAdded} days!`}`;
+      }
+    }
 
-    img.src = objectUrl;
-  });
-}
+    await supabase.from('plant_chats').insert([
+      { plant_id: plantId, user_id: userId, role: 'user', message },
+      { plant_id: plantId, user_id: userId, role: 'assistant', message: aiResponse }
+    ]);
 
-export const refreshPlantImage = (plantId, plantName, scientificName) =>
-  request(`/plants/${plantId}/refresh-image`, { 
-    method: 'POST', 
-    body: JSON.stringify({ plantName, scientificName }) 
-  });
+    res.json({ success: true, response: aiResponse, daysSinceAdded });
+  } catch (err) {
+    console.error('CHAT ROUTE CRASHED:', err.message);
+    res.status(500).json({ error: 'Chat failed', details: err.message });
+  }
+});
+
+router.get('/:plantId/history', async (req, res) => {
+  try {
+    const { data, error } = await supabase.from('plant_chats').select('*')
+      .eq('plant_id', req.params.plantId).order('created_at', { ascending: true });
+    if (error) throw error;
+    res.json({ success: true, data: data || [] });
+  } catch (err) { res.status(500).json({ error: 'Failed to fetch chat history' }); }
+});
+
+router.delete('/:plantId/history', async (req, res) => {
+  try {
+    await supabase.from('plant_chats').delete().eq('plant_id', req.params.plantId);
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: 'Failed to clear chat history' }); }
+});
+
+export default router;

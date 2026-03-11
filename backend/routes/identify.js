@@ -5,9 +5,9 @@ const router = express.Router();
 
 router.post('/by-name', async (req, res) => {
   try {
-    const { name } = req.body;
+    const { name, lang = 'en' } = req.body;
     if (!name) return res.status(400).json({ error: 'Plant name is required' });
-    const result = await identifyPlantByName(name);
+    const result = await identifyPlantByName(name, lang);
     res.json({ success: true, data: result });
   } catch (err) {
     console.error('Identify by name error:', err.message);
@@ -17,20 +17,11 @@ router.post('/by-name', async (req, res) => {
 
 router.post('/by-image', async (req, res) => {
   try {
-    let { image, mimeType } = req.body;
+    let { image, mimeType, lang = 'en' } = req.body;
     if (!image) return res.status(400).json({ error: 'Image data is required' });
-
-    // Groq vision works best with jpeg/png - normalize mimeType
-    if (!mimeType || mimeType === 'image/webp' || mimeType === 'image/gif') {
-      mimeType = 'image/jpeg';
-    }
-
-    // Validate base64 string
-    if (image.includes(',')) {
-      image = image.split(',')[1];
-    }
-
-    const result = await identifyPlantByImage(image, mimeType);
+    if (!mimeType || mimeType === 'image/webp' || mimeType === 'image/gif') mimeType = 'image/jpeg';
+    if (image.includes(',')) image = image.split(',')[1];
+    const result = await identifyPlantByImage(image, mimeType, lang);
     res.json({ success: true, data: result, source: 'groq-vision' });
   } catch (err) {
     console.error('Identify by image error:', err.message);
