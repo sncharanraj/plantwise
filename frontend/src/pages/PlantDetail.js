@@ -386,7 +386,7 @@ function JournalTab({ plantId, userId, t }) {
   return (
     <div style={{padding:'20px 0'}}>
       <div className="card animate-fadeUp" style={{padding:'20px 24px',marginBottom:24}}>
-        <h3 style={{fontFamily:'var(--font-display)',fontSize:18,fontWeight:600,marginBottom:14,color:'var(--olive-lite)'}}>📝 {t.logToday||'Log Today'}</h3>
+        <h3 style={{fontFamily:'"Cormorant Garamond",Georgia,serif',fontSize:18,fontWeight:600,marginBottom:14,color:'var(--olive-lite)'}}>📝 {t.logToday||'Log Today'}</h3>
         <textarea className="input" placeholder={t.journalPlaceholder||"What's happening with your plant today?"} value={note} onChange={e=>setNote(e.target.value)} rows={3} style={{resize:'vertical',marginBottom:12}}/>
         {imagePreview && <img src={imagePreview} alt="log" style={{width:'100%',maxHeight:180,objectFit:'cover',borderRadius:10,marginBottom:12}}/>}
         <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
@@ -431,11 +431,11 @@ const s = {
   hov:   {position:'absolute',inset:0,background:'linear-gradient(to top,rgba(0,0,0,0.85),rgba(0,0,0,0.2) 60%,transparent)'},
   hcon:  {position:'absolute',inset:0,display:'flex',flexDirection:'column',justifyContent:'space-between',padding:'20px 24px'},
   back:  {background:'rgba(255,255,255,0.12)',backdropFilter:'blur(8px)',border:'1px solid rgba(255,255,255,0.15)',color:'white',padding:'8px 16px',borderRadius:100,cursor:'pointer',fontSize:14,alignSelf:'flex-start'},
-  pname: {fontFamily:'var(--font-display)',fontSize:32,fontWeight:600,color:'white',textShadow:'0 2px 12px rgba(0,0,0,0.4)'},
+  pname: {fontFamily:'"Cormorant Garamond",Georgia,serif',fontSize:32,fontWeight:600,color:'white',textShadow:'0 2px 12px rgba(0,0,0,0.4)'},
   sci:   {fontStyle:'italic',color:'rgba(255,255,255,0.75)',fontSize:15,marginBottom:10},
   badges:{display:'flex',gap:8,flexWrap:'wrap'},
   tabs:  {display:'flex',background:'var(--bg)',borderBottom:'1px solid var(--border)',position:'sticky',top:0,zIndex:50},
-  tab:   {flex:1,padding:'14px 12px',background:'none',border:'none',cursor:'pointer',fontSize:14,fontWeight:500,color:'var(--text-3)',transition:'all 0.2s',borderBottom:'2px solid transparent',fontFamily:'var(--font-body)'},
+  tab:   {flex:1,padding:'14px 12px',background:'none',border:'none',cursor:'pointer',fontSize:14,fontWeight:500,color:'var(--text-3)',transition:'all 0.2s',borderBottom:'2px solid transparent',fontFamily:'"Outfit",system-ui,sans-serif'},
   taba:  {color:'var(--olive-lite)',borderBottomColor:'var(--olive-lite)',background:'rgba(82,183,136,0.06)'},
   content:{maxWidth:800,margin:'0 auto',padding:'0 16px'},
 };
@@ -446,7 +446,7 @@ const regen = {
 };
 const ov = {
   banner:{background:'linear-gradient(135deg,#1a4a35,#0d2a1d)',border:'1px solid rgba(82,183,136,0.2)',borderRadius:16,padding:'20px 24px',marginBottom:20,overflow:'hidden'},
-  text:  {fontSize:15,lineHeight:1.7,color:'rgba(255,255,255,0.88)',fontFamily:'var(--font-display)',marginBottom:10},
+  text:  {fontSize:15,lineHeight:1.7,color:'rgba(255,255,255,0.88)',fontFamily:'"Cormorant Garamond",Georgia,serif',marginBottom:10},
   meta:  {display:'flex',gap:20,fontSize:13,color:'rgba(255,255,255,0.55)'},
 };
 const nav = {
@@ -462,7 +462,7 @@ const det = {
   panel: {background:'var(--surface)',border:'1px solid var(--border-mid)',borderRadius:16,padding:'20px 22px',animation:'fadeUp 0.25s ease forwards'},
   hdr:   {display:'flex',alignItems:'center',gap:12},
   iconWrap:{width:40,height:40,borderRadius:12,background:'rgba(82,183,136,0.12)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:20,flexShrink:0},
-  title: {fontFamily:'var(--font-display)',fontSize:18,fontWeight:600,color:'var(--text-1)'},
+  title: {fontFamily:'"Cormorant Garamond",Georgia,serif',fontSize:18,fontWeight:600,color:'var(--text-1)'},
   sub:   {fontSize:13,color:'var(--text-3)',marginTop:2},
   row:   {display:'flex',justifyContent:'space-between',padding:'9px 0',borderBottom:'1px solid rgba(82,183,136,0.06)',gap:16},
   lbl:   {fontSize:13,color:'var(--text-3)',flexShrink:0,textTransform:'capitalize'},
