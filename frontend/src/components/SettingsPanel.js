@@ -222,7 +222,7 @@ const s = {
   hdr:      {display:'flex',alignItems:'center',gap:14,padding:'20px 20px 16px',borderBottom:'1px solid var(--border)',flexShrink:0},
   avatar:   {width:44,height:44,borderRadius:'50%',background:'linear-gradient(135deg,var(--green),var(--green-mid))',color:'var(--text-inv)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:18,fontWeight:700,flexShrink:0},
   backBtn:  {width:36,height:36,borderRadius:10,background:'var(--surface-2)',border:'1px solid var(--border-mid)',cursor:'pointer',fontSize:18,color:'var(--text-2)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0},
-  ttl:      {fontFamily:"'Syne',sans-serif",fontSize:20,fontWeight:600,color:'var(--text-1)'},
+  ttl:      {fontFamily:"'DM Serif Display',Georgia,serif",fontSize:20,fontWeight:600,color:'var(--text-1)'},
   email:    {fontSize:12,color:'var(--text-3)',marginTop:2},
   cls:      {background:'none',border:'none',cursor:'pointer',fontSize:18,color:'var(--text-3)',padding:4,flexShrink:0},
   scroll:   {flex:1,overflowY:'auto',paddingBottom:32},

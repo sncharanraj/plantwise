@@ -13,15 +13,23 @@ const LANG_NAMES = { en:'EN', hi:'हि', kn:'ಕ' };
 /* ── Sunflower SVG ── */
 function SunflowerSVG({ size=28 }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 80 80" fill="none">
+    <svg width={size} height={size} viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* Outer petals */}
       {Array.from({length:12}).map((_,i)=>{
-        const a=(i*30)*Math.PI/180,cx=40+Math.cos(a)*22,cy=40+Math.sin(a)*22;
-        return <ellipse key={i} cx={cx} cy={cy} rx="7" ry="11" fill="var(--amber)" opacity="0.92" transform={`rotate(${i*30} ${cx} ${cy})`}/>;
+        const a=(i*30)*Math.PI/180, cx=40+Math.cos(a)*24, cy=40+Math.sin(a)*24;
+        return <ellipse key={`o${i}`} cx={cx} cy={cy} rx="6.5" ry="12" fill="#f4c542" opacity="0.95" transform={`rotate(${i*30} ${cx} ${cy})`}/>;
       })}
-      <circle cx="40" cy="40" r="13" fill="#3d2000"/>
-      <circle cx="40" cy="40" r="10" fill="#2a1500"/>
-      {[[36,36],[40,34],[44,36],[45,40],[44,44],[40,46],[36,44],[35,40],[40,40]].map(([x,y],i)=>(
-        <circle key={i} cx={x} cy={y} r="1.4" fill="#5a3000" opacity="0.9"/>
+      {/* Inner petals offset */}
+      {Array.from({length:12}).map((_,i)=>{
+        const a=((i*30)+15)*Math.PI/180, cx=40+Math.cos(a)*20, cy=40+Math.sin(a)*20;
+        return <ellipse key={`i${i}`} cx={cx} cy={cy} rx="4" ry="9" fill="#e8a020" opacity="0.7" transform={`rotate(${i*30+15} ${cx} ${cy})`}/>;
+      })}
+      {/* Dark center */}
+      <circle cx="40" cy="40" r="14" fill="#3d1f00"/>
+      <circle cx="40" cy="40" r="11" fill="#2a1200"/>
+      {/* Seed dots */}
+      {[[36,36],[40,34],[44,36],[46,40],[44,44],[40,46],[36,44],[34,40],[40,40],[38,38],[42,38],[42,42],[38,42]].map(([x,y],i)=>(
+        <circle key={i} cx={x} cy={y} r="1.3" fill="#6b3a00" opacity="0.85"/>
       ))}
     </svg>
   );
@@ -258,7 +266,7 @@ function HomeView({ user, plants, loading, t, tn, dc, onGarden, onAdd, onPlantCl
       </div>
 
       {/* ── QUICK TIPS (interactive flip cards) ── */}
-      <section style={{...hv.section,animationDelay:'0.1s'}} className="animate-fadeUp">
+      <section style={{ ...hv.section, animationDelay: '0.1s' }} className="animate-fadeUp">
         <div style={hv.secRow}>
           <h2 style={hv.secTitle}>🌿 Plant Tips</h2>
           <span style={hv.secSub}>Tap to reveal</span>
@@ -271,23 +279,11 @@ function HomeView({ user, plants, loading, t, tn, dc, onGarden, onAdd, onPlantCl
       {/* ── SEASON BANNER ── */}
       <SeasonBanner/>
 
-      {/* ── RECENT PLANTS ── */}
-      {recentPlants.length>0&&(
-        <section style={hv.section} className="animate-fadeUp">
-          <div style={hv.secRow}>
-            <h2 style={hv.secTitle}>🪴 {t.myGarden}</h2>
-            <button style={hv.seeAllBtn} onClick={onGarden}>See all →</button>
-          </div>
-          <div style={hv.plantGrid}>
-            {recentPlants.map((p,i)=>(
-              <PlantCard key={p.id} plant={p} tn={tn} dc={dc} t={t}
-                wateringId={wateringId} delay={i*0.06}
-                onClick={()=>onPlantClick(p.id)}
-                onWater={onWater} onDelete={onDelete}/>
-            ))}
-          </div>
-        </section>
-      )}
+      {/* ── PLANT FACTS ── */}
+      <PlantFacts/>
+
+      {/* ── GROWING TIPS ── */}
+      <GrowingTips/>
 
       {/* ── EMPTY STATE ── */}
       {plants.length===0&&!loading&&(
@@ -321,29 +317,131 @@ const TIPS = [
 function FlipTip({ icon, title, front, back, color, delay=0 }) {
   const [flipped, setFlipped] = useState(false);
   return (
-    <div style={{...ft.wrap,animationDelay:`${delay}s`}} className="animate-fadeUp" onClick={()=>setFlipped(f=>!f)}>
-      <div style={{...ft.card,...(flipped?ft.flipped:{})}}>
-        <div style={ft.face}>
-          <div style={{...ft.iconBg,background:`${color}18`,border:`1px solid ${color}30`}}>
-            <span style={{fontSize:22}}>{icon}</span>
+    <div style={{animationDelay:`${delay}s`,cursor:'pointer'}} className="animate-fadeUp" onClick={()=>setFlipped(f=>!f)}>
+      <div style={{
+        background: flipped ? `linear-gradient(145deg,${color}15,${color}08)` : 'var(--surface)',
+        border: `1px solid ${flipped ? color+'40' : 'var(--border-2)'}`,
+        borderRadius:18, padding:'16px',
+        transition:'all 0.35s cubic-bezier(0.22,1,0.36,1)',
+        boxShadow: flipped ? `0 4px 20px ${color}20` : 'var(--shadow-xs)',
+      }}>
+        <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:10}}>
+          <div style={{width:36,height:36,borderRadius:10,display:'flex',alignItems:'center',justifyContent:'center',background:`${color}18`,border:`1px solid ${color}30`,flexShrink:0}}>
+            <span style={{fontSize:20}}>{icon}</span>
           </div>
-          <p style={{...ft.ttl,color}}>{title}</p>
-          <p style={ft.txt}>{front}</p>
-          <span style={ft.tap}>Tap →</span>
+          <p style={{fontSize:13,fontWeight:700,color,letterSpacing:'0.02em'}}>{title}</p>
+          <span style={{marginLeft:'auto',fontSize:14,transition:'transform 0.3s',transform:flipped?'rotate(45deg)':'rotate(0deg)',color:'var(--text-3)'}}>✦</span>
         </div>
-        <div style={{...ft.face,position:'absolute',inset:0,background:`linear-gradient(145deg,${color}18,${color}08)`,border:`1px solid ${color}30`,transform:'rotateY(180deg)',backfaceVisibility:'hidden',borderRadius:18}}>
-          <div style={{...ft.iconBg,background:`${color}25`,border:`1px solid ${color}40`}}>
-            <span style={{fontSize:22}}>{icon}</span>
-          </div>
-          <p style={{...ft.ttl,color}}>{title}</p>
-          <p style={{...ft.txt,fontSize:12,lineHeight:1.65,color:'var(--text-2)'}}>{back}</p>
-        </div>
+        <p style={{fontSize:12,color:'var(--text-2)',lineHeight:1.65}}>
+          {flipped ? back : front}
+        </p>
+        {!flipped && <span style={{fontSize:10,color:'var(--text-4)',display:'block',marginTop:8,textAlign:'right'}}>Tap to learn more →</span>}
       </div>
     </div>
   );
 }
 
-/* ── Season banner ── */
+/* ── Plant Facts carousel ── */
+const FACTS = [
+  { emoji:'🌳', fact:'The world\'s oldest living tree is over 5,000 years old — a bristlecone pine in California named Methuselah.', tag:'Did You Know?' },
+  { emoji:'🌿', fact:'Plants can communicate with each other through underground fungal networks called the "Wood Wide Web".', tag:'Science' },
+  { emoji:'💨', fact:'A single mature tree absorbs about 21 kg of CO₂ per year and produces enough oxygen for 2 people.', tag:'Environment' },
+  { emoji:'🌺', fact:'There are over 400,000 known plant species on Earth — and scientists discover new ones every year.', tag:'Biodiversity' },
+  { emoji:'🍃', fact:'The Venus flytrap can snap shut in as little as 0.1 seconds — one of the fastest movements in the plant kingdom.', tag:'Amazing' },
+  { emoji:'🌵', fact:'Cacti can survive years without rain. The saguaro cactus can absorb up to 750 litres of water in a single rainstorm.', tag:'Survival' },
+  { emoji:'🌸', fact:'Bamboo is the fastest-growing plant on Earth — some species grow up to 91 cm in a single day.', tag:'Record' },
+  { emoji:'🍀', fact:'Most plants grow toward light (phototropism), but roots grow away from light and toward gravity (gravitropism).', tag:'Biology' },
+];
+
+function PlantFacts() {
+  const [idx, setIdx] = useState(0);
+  const [anim, setAnim] = useState(true);
+  
+  function goTo(i) {
+    setAnim(false);
+    setTimeout(()=>{ setIdx(i); setAnim(true); }, 80);
+  }
+  
+  useEffect(()=>{
+    const t = setInterval(()=>goTo((idx+1)%FACTS.length), 5000);
+    return ()=>clearInterval(t);
+  },[idx]);
+
+  const f = FACTS[idx];
+  return (
+    <section style={hv.section} className="animate-fadeUp">
+      <div style={hv.secRow}>
+        <h2 style={hv.secTitle}>🌍 Plant Facts</h2>
+        <span style={hv.secSub}>{idx+1} / {FACTS.length}</span>
+      </div>
+      <div style={pf.card}>
+        <div style={pf.tagRow}>
+          <span style={pf.tag}>{f.tag}</span>
+          <div style={pf.dots}>
+            {FACTS.map((_,i)=>(
+              <button key={i} style={{...pf.dot,...(i===idx?pf.dotOn:{})}} onClick={()=>goTo(i)}/>
+            ))}
+          </div>
+        </div>
+        <div style={{...pf.body,opacity:anim?1:0,transform:anim?'translateY(0)':'translateY(8px)',transition:'all 0.2s'}}>
+          <span style={pf.emoji}>{f.emoji}</span>
+          <p style={pf.fact}>{f.fact}</p>
+        </div>
+        <div style={pf.arrows}>
+          <button style={pf.arrow} onClick={()=>goTo((idx-1+FACTS.length)%FACTS.length)}>←</button>
+          <button style={pf.arrow} onClick={()=>goTo((idx+1)%FACTS.length)}>→</button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ── Common Growing Tips ── */
+const GROWING_TIPS = [
+  { icon:'🪴', title:'Choose the Right Pot', tip:'Always use pots with drainage holes. Root rot from waterlogged soil kills more plants than anything else.', color:'#2d6a4f' },
+  { icon:'💡', title:'Light First, Water Second', tip:'Assess your light conditions before buying any plant. Even drought-tolerant plants fail without adequate light.', color:'#d4860a' },
+  { icon:'🌡️', title:'Acclimatize New Plants', tip:'New plants need 1–2 weeks to adjust. Keep them away from other plants to watch for pests, and don\'t repot immediately.', color:'#3a86b4' },
+  { icon:'📅', title:'Seasonal Routine', tip:'Water more in summer, less in winter. Most plants rest during winter and don\'t need fertilizer from October to February.', color:'#7b5ea7' },
+  { icon:'🔬', title:'Inspect Weekly', tip:'Check the undersides of leaves weekly. Catching pests early (spider mites, mealybugs) prevents an infestation.', color:'#c0485a' },
+  { icon:'✂️', title:'Dead-head Regularly', tip:'Remove spent flowers and yellow leaves promptly. Dead plant material invites fungus and wastes the plant\'s energy.', color:'#52b788' },
+];
+
+function GrowingTips() {
+  const [open, setOpen] = useState(null);
+  return (
+    <section style={{...hv.section,marginBottom:24}} className="animate-fadeUp">
+      <div style={hv.secRow}>
+        <h2 style={hv.secTitle}>📚 Growing Tips</h2>
+        <span style={hv.secSub}>Tap to expand</span>
+      </div>
+      <div style={{display:'flex',flexDirection:'column',gap:8}}>
+        {GROWING_TIPS.map((tip,i)=>(
+          <div key={i} style={{
+            background:'var(--surface)', border:`1px solid ${open===i?tip.color+'50':'var(--border)'}`,
+            borderRadius:14, overflow:'hidden',
+            boxShadow: open===i ? `0 4px 20px ${tip.color}18` : 'var(--shadow-xs)',
+            transition:'all 0.25s cubic-bezier(0.22,1,0.36,1)',
+          }}>
+            <button style={{
+              width:'100%', display:'flex', alignItems:'center', gap:12,
+              padding:'14px 16px', background:'none', border:'none', cursor:'pointer',
+              textAlign:'left',
+            }} onClick={()=>setOpen(open===i?null:i)}>
+              <span style={{width:36,height:36,borderRadius:10,background:`${tip.color}15`,border:`1px solid ${tip.color}30`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:18,flexShrink:0}}>{tip.icon}</span>
+              <span style={{flex:1,fontSize:14,fontWeight:600,color:'var(--text-1)',fontFamily:"'DM Serif Display',Georgia,serif"}}>{tip.title}</span>
+              <span style={{fontSize:16,color:'var(--text-3)',transition:'transform 0.25s',transform:open===i?'rotate(45deg)':'rotate(0deg)'}}>+</span>
+            </button>
+            {open===i&&(
+              <div style={{padding:'0 16px 16px 64px'}} className="animate-fadeIn">
+                <p style={{fontSize:13,color:'var(--text-2)',lineHeight:1.7}}>{tip.tip}</p>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
 function SeasonBanner() {
   const month = new Date().getMonth();
   const seasons = [
@@ -483,10 +581,10 @@ const pg = {
   root:    {minHeight:'100vh',background:'var(--bg)',display:'flex',flexDirection:'column'},
   nav:     {position:'sticky',top:0,zIndex:100,background:'var(--nav-bg)',backdropFilter:'blur(20px)',WebkitBackdropFilter:'blur(20px)',borderBottom:'1px solid var(--border)',height:58,display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 20px',flexShrink:0},
   brand:   {display:'flex',alignItems:'center',gap:10,background:'none',border:'none',cursor:'pointer',padding:0},
-  brandTxt:{fontFamily:"'Syne',sans-serif",fontSize:20,fontWeight:700,color:'var(--text-1)',letterSpacing:'-0.02em'},
+  brandTxt:{fontFamily:"'DM Serif Display',Georgia,serif",fontSize:20,fontWeight:700,color:'var(--text-1)',letterSpacing:'-0.02em'},
   navR:    {display:'flex',alignItems:'center',gap:6},
   langPill:{display:'flex',background:'var(--surface-2)',borderRadius:100,padding:3,gap:2,border:'1px solid var(--border-2)'},
-  langBtn: {padding:'4px 10px',borderRadius:100,border:'none',background:'transparent',cursor:'pointer',fontSize:12,fontWeight:600,color:'var(--text-3)',transition:'all 0.18s',fontFamily:"'Manrope',sans-serif"},
+  langBtn: {padding:'4px 10px',borderRadius:100,border:'none',background:'transparent',cursor:'pointer',fontSize:12,fontWeight:600,color:'var(--text-3)',transition:'all 0.18s',fontFamily:"'Plus Jakarta Sans',sans-serif"},
   langOn:  {background:'var(--green)',color:'#fff'},
   iconBtn: {width:36,height:36,borderRadius:10,border:'1px solid var(--border-2)',background:'var(--surface-2)',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',transition:'all 0.18s'},
   notifDot:{position:'absolute',top:-3,right:-3,background:'var(--rose)',color:'white',borderRadius:'50%',width:16,height:16,fontSize:9,display:'flex',alignItems:'center',justifyContent:'center',fontWeight:700},
@@ -497,7 +595,7 @@ const pg = {
 };
 
 const sd = {
-  btn:     {display:'flex',alignItems:'center',gap:12,padding:'12px 16px',borderRadius:14,border:'none',background:'transparent',cursor:'pointer',width:'100%',transition:'all 0.18s',color:'var(--text-2)',fontFamily:"'Manrope',sans-serif",fontSize:14,fontWeight:500,position:'relative'},
+  btn:     {display:'flex',alignItems:'center',gap:12,padding:'12px 16px',borderRadius:14,border:'none',background:'transparent',cursor:'pointer',width:'100%',transition:'all 0.18s',color:'var(--text-2)',fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:14,fontWeight:500,position:'relative'},
   active:  {background:'var(--green-glow)',color:'var(--green)'},
   icon:    {fontSize:18,width:28,textAlign:'center',flexShrink:0},
   label:   {flex:1,textAlign:'left'},
@@ -520,40 +618,45 @@ const hv = {
   heroContent:{position:'relative',zIndex:2,display:'flex',justifyContent:'space-between',alignItems:'flex-start',flexWrap:'wrap',gap:20},
   heroLeft:{flex:1,minWidth:200},
   greetText:{fontSize:13,color:'rgba(255,255,255,0.65)',fontWeight:500,letterSpacing:'0.04em',marginBottom:4},
-  heroName: {fontFamily:"'Syne',sans-serif",fontSize:44,fontWeight:800,color:'#fff',lineHeight:1.1,marginBottom:8,letterSpacing:'-0.02em'},
+  heroName: {fontFamily:"'DM Serif Display',Georgia,serif",fontSize:44,fontWeight:800,color:'#fff',lineHeight:1.1,marginBottom:8,letterSpacing:'-0.02em'},
   heroSub:  {fontSize:15,color:'rgba(255,255,255,0.72)',marginBottom:24},
-  heroAddBtn:{display:'inline-flex',alignItems:'center',gap:8,padding:'11px 22px',background:'rgba(255,255,255,0.15)',border:'1px solid rgba(255,255,255,0.25)',borderRadius:100,color:'white',fontSize:14,fontWeight:600,cursor:'pointer',backdropFilter:'blur(10px)',transition:'all 0.22s',fontFamily:"'Manrope',sans-serif"},
+  heroAddBtn:{display:'inline-flex',alignItems:'center',gap:8,padding:'11px 22px',background:'rgba(255,255,255,0.15)',border:'1px solid rgba(255,255,255,0.25)',borderRadius:100,color:'white',fontSize:14,fontWeight:600,cursor:'pointer',backdropFilter:'blur(10px)',transition:'all 0.22s',fontFamily:"'Plus Jakarta Sans',sans-serif"},
   healthOrb: {position:'relative',width:120,height:120,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0},
   healthInner:{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center'},
-  healthVal: {fontFamily:"'Syne',sans-serif",fontSize:28,fontWeight:800,color:'white',lineHeight:1},
+  healthVal: {fontFamily:"'DM Serif Display',Georgia,serif",fontSize:28,fontWeight:800,color:'white',lineHeight:1},
   healthLbl: {fontSize:10,color:'rgba(255,255,255,0.6)',letterSpacing:'0.08em',textTransform:'uppercase'},
   statsRow:  {position:'relative',zIndex:2,display:'flex',gap:0,marginTop:24,borderTop:'1px solid rgba(255,255,255,0.1)',paddingTop:20,paddingBottom:20},
   stat:      {flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:3,borderRight:'1px solid rgba(255,255,255,0.08)'},
   statIcon:  {fontSize:18},
-  statVal:   {fontFamily:"'Syne',sans-serif",fontSize:26,fontWeight:700,color:'white',lineHeight:1},
+  statVal:   {fontFamily:"'DM Serif Display',Georgia,serif",fontSize:26,fontWeight:700,color:'white',lineHeight:1},
   statLbl:   {fontSize:11,color:'rgba(255,255,255,0.55)',letterSpacing:'0.04em'},
   section:   {marginBottom:24},
   secRow:    {display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:14},
-  secTitle:  {fontFamily:"'Syne',sans-serif",fontSize:20,fontWeight:700,color:'var(--text-1)'},
+  secTitle:  {fontFamily:"'DM Serif Display',Georgia,serif",fontSize:20,fontWeight:700,color:'var(--text-1)'},
   secSub:    {fontSize:12,color:'var(--text-3)'},
   tipsGrid:  {display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(160px,1fr))',gap:12},
   seeAllBtn: {background:'none',border:'none',color:'var(--green-lite)',fontSize:14,fontWeight:600,cursor:'pointer'},
   plantGrid: {display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(200px,1fr))',gap:16},
   empty:     {textAlign:'center',padding:'60px 20px'},
   emptyOrb:  {width:120,height:120,borderRadius:'50%',background:'var(--green-glow)',display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 20px'},
-  emptyTitle:{fontFamily:"'Syne',sans-serif",fontSize:28,fontWeight:700,color:'var(--text-1)',marginBottom:10},
+  emptyTitle:{fontFamily:"'DM Serif Display',Georgia,serif",fontSize:28,fontWeight:700,color:'var(--text-1)',marginBottom:10},
   emptySub:  {color:'var(--text-3)',lineHeight:1.6,maxWidth:300,margin:'0 auto'},
 };
 
-const ft = {
-  wrap:  {perspective:600,cursor:'pointer',minHeight:150},
-  card:  {position:'relative',height:150,transformStyle:'preserve-3d',transition:'transform 0.5s cubic-bezier(0.22,1,0.36,1)'},
-  flipped:{transform:'rotateY(180deg)'},
-  face:  {position:'absolute',inset:0,background:'var(--surface)',border:'1px solid var(--border-2)',borderRadius:18,padding:'14px',backfaceVisibility:'hidden',display:'flex',flexDirection:'column',gap:6},
-  iconBg:{width:36,height:36,borderRadius:10,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0},
-  ttl:   {fontSize:13,fontWeight:700,letterSpacing:'0.02em'},
-  txt:   {fontSize:12,color:'var(--text-3)',lineHeight:1.5,flex:1},
-  tap:   {fontSize:10,color:'var(--text-4)',alignSelf:'flex-end'},
+/* ft styles removed — FlipTip now uses inline styles */
+
+const pf = {
+  card:  {background:'var(--surface)',border:'1px solid var(--border-2)',borderRadius:20,padding:'20px 24px',boxShadow:'var(--shadow-sm)'},
+  tagRow:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:14},
+  tag:   {fontSize:11,fontWeight:700,color:'var(--green-mid)',background:'var(--green-glow)',padding:'4px 12px',borderRadius:100,letterSpacing:'0.06em',textTransform:'uppercase'},
+  dots:  {display:'flex',gap:5},
+  dot:   {width:6,height:6,borderRadius:'50%',background:'var(--border-2)',border:'none',cursor:'pointer',padding:0,transition:'all 0.2s'},
+  dotOn: {background:'var(--green-mid)',transform:'scale(1.4)'},
+  body:  {display:'flex',alignItems:'flex-start',gap:16,marginBottom:16},
+  emoji: {fontSize:40,flexShrink:0,lineHeight:1},
+  fact:  {fontSize:15,color:'var(--text-1)',lineHeight:1.7,fontWeight:500},
+  arrows:{display:'flex',gap:10,justifyContent:'flex-end'},
+  arrow: {width:36,height:36,borderRadius:10,border:'1px solid var(--border-2)',background:'var(--surface-2)',cursor:'pointer',fontSize:16,color:'var(--text-2)',display:'flex',alignItems:'center',justifyContent:'center',transition:'all 0.18s'},
 };
 
 const sb = {
@@ -573,7 +676,7 @@ const pc = {
   actions: {position:'absolute',top:8,right:8,display:'flex',gap:6,opacity:0,transition:'opacity 0.2s'},
   actBtn:  {width:32,height:32,borderRadius:9,border:'none',cursor:'pointer',fontSize:14,display:'flex',alignItems:'center',justifyContent:'center',background:'rgba(8,14,11,0.55)',backdropFilter:'blur(6px)',color:'white',transition:'all 0.2s'},
   info:    {padding:'12px 14px 14px'},
-  name:    {fontFamily:"'Syne',sans-serif",fontSize:16,fontWeight:700,color:'var(--text-1)',marginBottom:2,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'},
+  name:    {fontFamily:"'DM Serif Display',Georgia,serif",fontSize:16,fontWeight:700,color:'var(--text-1)',marginBottom:2,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'},
   sci:     {fontSize:11,fontStyle:'italic',color:'var(--text-3)',marginBottom:8,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'},
   footer:  {display:'flex',justifyContent:'space-between',alignItems:'center'},
   days:    {fontSize:12,color:'var(--text-3)'},
@@ -583,7 +686,7 @@ const pc = {
 const gv = {
   page:      {maxWidth:1000,margin:'0 auto',padding:'20px 20px 0'},
   hdr:       {display:'flex',alignItems:'flex-start',justifyContent:'space-between',marginBottom:20,flexWrap:'wrap',gap:12},
-  title:     {fontFamily:"'Syne',sans-serif",fontSize:28,fontWeight:800,color:'var(--text-1)',letterSpacing:'-0.02em'},
+  title:     {fontFamily:"'DM Serif Display',Georgia,serif",fontSize:28,fontWeight:800,color:'var(--text-1)',letterSpacing:'-0.02em'},
   sub:       {fontSize:14,color:'var(--text-3)',marginTop:4},
   controls:  {display:'flex',flexDirection:'column',gap:10,marginBottom:20},
   searchWrap:{position:'relative'},
@@ -597,7 +700,7 @@ const gv = {
 };
 
 const mt = {
-  btn:    {display:'flex',flexDirection:'column',alignItems:'center',gap:3,background:'none',border:'none',cursor:'pointer',padding:'8px 20px',borderRadius:12,color:'var(--text-3)',transition:'all 0.18s',fontFamily:"'Manrope',sans-serif"},
+  btn:    {display:'flex',flexDirection:'column',alignItems:'center',gap:3,background:'none',border:'none',cursor:'pointer',padding:'8px 20px',borderRadius:12,color:'var(--text-3)',transition:'all 0.18s',fontFamily:"'Plus Jakarta Sans',sans-serif"},
   active: {color:'var(--green)'},
   label:  {fontSize:11,fontWeight:600},
 };
@@ -606,7 +709,7 @@ const mo = {
   bd:    {position:'fixed',inset:0,background:'var(--overlay)',backdropFilter:'blur(8px)',zIndex:200},
   box:   {position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)',background:'var(--surface)',borderRadius:24,padding:'32px 28px',zIndex:201,width:'min(90vw,380px)',textAlign:'center',boxShadow:'var(--shadow-lg)',border:'1px solid var(--border-2)'},
   emoji: {fontSize:44,marginBottom:14},
-  title: {fontFamily:"'Syne',sans-serif",fontSize:22,fontWeight:700,color:'var(--text-1)',marginBottom:8},
+  title: {fontFamily:"'DM Serif Display',Georgia,serif",fontSize:22,fontWeight:700,color:'var(--text-1)',marginBottom:8},
   desc:  {color:'var(--text-3)',fontSize:14,lineHeight:1.6},
 };
 
