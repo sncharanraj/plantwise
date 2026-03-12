@@ -153,7 +153,7 @@ export default function Dashboard() {
         {/* Main */}
         <main style={pg.main}>
           {view==='home'
-            ? <HomeView user={user} plants={plants} loading={loading} t={t} tn={tn} dc={dc}
+            ? <HomeView user={user} plants={plants} loading={loading} t={t} tn={tn} dc={dc} lang={lang}
                 onGarden={()=>setView('garden')} onAdd={()=>setShowAdd(true)}
                 onPlantClick={id=>navigate(`/plant/${id}`)}
                 onWater={handleWater} wateringId={wateringId} onDelete={id=>setDeleteConfirm(id)}/>
@@ -198,7 +198,7 @@ export default function Dashboard() {
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━
    HOME VIEW
 ━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-function HomeView({ user, plants, loading, t, tn, dc, onGarden, onAdd, onPlantClick, onWater, wateringId, onDelete }) {
+function HomeView({ user, plants, loading, t, tn, dc, lang, onGarden, onAdd, onPlantClick, onWater, wateringId, onDelete }) {
   const hour = new Date().getHours();
   const greet = hour<5?'Good night 🌙':hour<12?'Good morning 🌅':hour<17?'Good afternoon ☀️':hour<21?'Good evening 🌆':'Good night 🌙';
   const name = user?.user_metadata?.full_name?.split(' ')[0] || user?.email?.split('@')[0] || 'Gardener';
@@ -266,24 +266,24 @@ function HomeView({ user, plants, loading, t, tn, dc, onGarden, onAdd, onPlantCl
       </div>
 
       {/* ── QUICK TIPS (interactive flip cards) ── */}
-      <section style={{ ...hv.section, animationDelay: '0.1s' }} className="animate-fadeUp">
+      <section style={{...hv.section,animationDelay:'0.1s'}} className="animate-fadeUp">
         <div style={hv.secRow}>
-          <h2 style={hv.secTitle}>🌿 Plant Tips</h2>
-          <span style={hv.secSub}>Tap to reveal</span>
+          <h2 style={hv.secTitle}>{t.plantTips||'🌿 Plant Tips'}</h2>
+          <span style={hv.secSub}>{t.tapToReveal||'Tap to reveal'}</span>
         </div>
         <div style={hv.tipsGrid}>
-          {TIPS.map((tip,i)=><FlipTip key={i} {...tip} delay={i*0.08}/>)}
+          {TIPS(t).map((tip,i)=><FlipTip key={i} {...tip} tapLabel={t.tapToLearn||'Tap to learn more →'} delay={i*0.08}/>)}
         </div>
       </section>
 
       {/* ── SEASON BANNER ── */}
-      <SeasonBanner/>
+      <SeasonBanner t={t}/>
 
       {/* ── PLANT FACTS ── */}
-      <PlantFacts/>
+      <PlantFacts t={t}/>
 
       {/* ── GROWING TIPS ── */}
-      <GrowingTips/>
+      <GrowingTips t={t}/>
 
       {/* ── EMPTY STATE ── */}
       {plants.length===0&&!loading&&(
@@ -305,16 +305,16 @@ function HomeView({ user, plants, loading, t, tn, dc, onGarden, onAdd, onPlantCl
 }
 
 /* ── Flip tip card ── */
-const TIPS = [
-  {icon:'💧', title:'Watering',    front:'Proper hydration is key to plant health.',      back:'Check soil moisture 1" deep before watering. Most plants prefer deep, infrequent watering over shallow daily watering.',     color:'#3a86b4'},
-  {icon:'☀️', title:'Sunlight',   front:'Light is food for your plants.',                 back:'Rotate your plants 90° weekly for even growth. South-facing windows get the most light in the northern hemisphere.',          color:'#d4860a'},
-  {icon:'🌡️', title:'Temperature', front:'Temperature swings stress plants.',             back:'Keep plants away from AC vents and cold drafts. Most tropicals prefer 18–27°C. Sudden drops cause leaf drop.',               color:'#c0485a'},
-  {icon:'🌱', title:'Soil',        front:'Good soil = healthy roots = thriving plant.',   back:'Refresh potting mix every 1–2 years. Add perlite for drainage and worm castings for slow-release nutrients.',                color:'#2d6a4f'},
-  {icon:'✂️', title:'Pruning',     front:'Pruning encourages bushier, fuller growth.',    back:'Always cut above a leaf node at 45°. Remove dead or yellowing leaves first. Clean your scissors with alcohol first.',         color:'#7b5ea7'},
-  {icon:'🪱', title:'Fertilizing', front:'Feed your plants during their growth season.',  back:'Use a balanced NPK fertilizer (like 10-10-10) every 2–4 weeks in spring/summer. Stop feeding in winter.',                   color:'#5a6e44'},
+const TIPS = (t) => [
+  {icon:'💧', title:t.tipWateringTitle||'Watering',    front:t.tipWateringFront||'Proper hydration is key to plant health.',  back:t.tipWateringBack||'Check soil moisture 1" deep before watering.',  color:'#3a86b4'},
+  {icon:'☀️', title:t.tipSunlightTitle||'Sunlight',   front:t.tipSunlightFront||'Light is food for your plants.',            back:t.tipSunlightBack||'Rotate your plants 90° weekly for even growth.',  color:'#d4860a'},
+  {icon:'🌡️', title:t.tipTempTitle||'Temperature',    front:t.tipTempFront||'Temperature swings stress plants.',             back:t.tipTempBack||'Keep plants away from AC vents and cold drafts.',      color:'#c0485a'},
+  {icon:'🌱', title:t.tipSoilTitle||'Soil',           front:t.tipSoilFront||'Good soil = healthy roots = thriving plant.',   back:t.tipSoilBack||'Refresh potting mix every 1–2 years.',               color:'#2d6a4f'},
+  {icon:'✂️', title:t.tipPruningTitle||'Pruning',     front:t.tipPruningFront||'Pruning encourages bushier, fuller growth.', back:t.tipPruningBack||'Always cut above a leaf node at 45°.',             color:'#7b5ea7'},
+  {icon:'🪱', title:t.tipFertTitle||'Fertilizing',    front:t.tipFertFront||'Feed your plants during their growth season.',  back:t.tipFertBack||'Use a balanced NPK fertilizer every 2–4 weeks.',     color:'#5a6e44'},
 ];
 
-function FlipTip({ icon, title, front, back, color, delay=0 }) {
+function FlipTip({ icon, title, front, back, color, tapLabel, delay=0 }) {
   const [flipped, setFlipped] = useState(false);
   return (
     <div style={{animationDelay:`${delay}s`,cursor:'pointer'}} className="animate-fadeUp" onClick={()=>setFlipped(f=>!f)}>
@@ -335,27 +335,28 @@ function FlipTip({ icon, title, front, back, color, delay=0 }) {
         <p style={{fontSize:12,color:'var(--text-2)',lineHeight:1.65}}>
           {flipped ? back : front}
         </p>
-        {!flipped && <span style={{fontSize:10,color:'var(--text-4)',display:'block',marginTop:8,textAlign:'right'}}>Tap to learn more →</span>}
+        {!flipped && <span style={{fontSize:10,color:'var(--text-4)',display:'block',marginTop:8,textAlign:'right'}}>{tapLabel||'Tap to learn more →'}</span>}
       </div>
     </div>
   );
 }
 
 /* ── Plant Facts carousel ── */
-const FACTS = [
-  { emoji:'🌳', fact:'The world\'s oldest living tree is over 5,000 years old — a bristlecone pine in California named Methuselah.', tag:'Did You Know?' },
-  { emoji:'🌿', fact:'Plants can communicate with each other through underground fungal networks called the "Wood Wide Web".', tag:'Science' },
-  { emoji:'💨', fact:'A single mature tree absorbs about 21 kg of CO₂ per year and produces enough oxygen for 2 people.', tag:'Environment' },
-  { emoji:'🌺', fact:'There are over 400,000 known plant species on Earth — and scientists discover new ones every year.', tag:'Biodiversity' },
-  { emoji:'🍃', fact:'The Venus flytrap can snap shut in as little as 0.1 seconds — one of the fastest movements in the plant kingdom.', tag:'Amazing' },
-  { emoji:'🌵', fact:'Cacti can survive years without rain. The saguaro cactus can absorb up to 750 litres of water in a single rainstorm.', tag:'Survival' },
-  { emoji:'🌸', fact:'Bamboo is the fastest-growing plant on Earth — some species grow up to 91 cm in a single day.', tag:'Record' },
-  { emoji:'🍀', fact:'Most plants grow toward light (phototropism), but roots grow away from light and toward gravity (gravitropism).', tag:'Biology' },
+const FACTS = (t) => [
+  { emoji:'🌳', fact:t.fact1||'The world\'s oldest living tree is over 5,000 years old.', tag:t.factTag1||'Did You Know?' },
+  { emoji:'🌿', fact:t.fact2||'Plants communicate through underground fungal networks.', tag:t.factTag2||'Science' },
+  { emoji:'💨', fact:t.fact3||'A mature tree absorbs 21 kg of CO₂ per year.', tag:t.factTag3||'Environment' },
+  { emoji:'🌺', fact:t.fact4||'There are over 400,000 known plant species on Earth.', tag:t.factTag4||'Biodiversity' },
+  { emoji:'🍃', fact:t.fact5||'The Venus flytrap can snap shut in 0.1 seconds.', tag:t.factTag5||'Amazing' },
+  { emoji:'🌵', fact:t.fact6||'Cacti can survive years without rain.', tag:t.factTag6||'Survival' },
+  { emoji:'🌸', fact:t.fact7||'Bamboo grows up to 91 cm in a single day.', tag:t.factTag7||'Record' },
+  { emoji:'🍀', fact:t.fact8||'Plants grow toward light; roots grow toward gravity.', tag:t.factTag8||'Biology' },
 ];
 
-function PlantFacts() {
+function PlantFacts({ t }) {
   const [idx, setIdx] = useState(0);
   const [anim, setAnim] = useState(true);
+  const facts = FACTS(t);
   
   function goTo(i) {
     setAnim(false);
@@ -363,22 +364,22 @@ function PlantFacts() {
   }
   
   useEffect(()=>{
-    const t = setInterval(()=>goTo((idx+1)%FACTS.length), 5000);
-    return ()=>clearInterval(t);
+    const timer = setInterval(()=>goTo((idx+1)%facts.length), 5000);
+    return ()=>clearInterval(timer);
   },[idx]);
 
-  const f = FACTS[idx];
+  const f = facts[idx];
   return (
     <section style={hv.section} className="animate-fadeUp">
       <div style={hv.secRow}>
-        <h2 style={hv.secTitle}>🌍 Plant Facts</h2>
-        <span style={hv.secSub}>{idx+1} / {FACTS.length}</span>
+        <h2 style={hv.secTitle}>{t.plantFacts||'🌍 Plant Facts'}</h2>
+        <span style={hv.secSub}>{idx+1} {t.factOf||'/'} {facts.length}</span>
       </div>
       <div style={pf.card}>
         <div style={pf.tagRow}>
           <span style={pf.tag}>{f.tag}</span>
           <div style={pf.dots}>
-            {FACTS.map((_,i)=>(
+            {facts.map((_,i)=>(
               <button key={i} style={{...pf.dot,...(i===idx?pf.dotOn:{})}} onClick={()=>goTo(i)}/>
             ))}
           </div>
@@ -388,8 +389,8 @@ function PlantFacts() {
           <p style={pf.fact}>{f.fact}</p>
         </div>
         <div style={pf.arrows}>
-          <button style={pf.arrow} onClick={()=>goTo((idx-1+FACTS.length)%FACTS.length)}>←</button>
-          <button style={pf.arrow} onClick={()=>goTo((idx+1)%FACTS.length)}>→</button>
+          <button style={pf.arrow} onClick={()=>goTo((idx-1+facts.length)%facts.length)}>←</button>
+          <button style={pf.arrow} onClick={()=>goTo((idx+1)%facts.length)}>→</button>
         </div>
       </div>
     </section>
@@ -397,25 +398,26 @@ function PlantFacts() {
 }
 
 /* ── Common Growing Tips ── */
-const GROWING_TIPS = [
-  { icon:'🪴', title:'Choose the Right Pot', tip:'Always use pots with drainage holes. Root rot from waterlogged soil kills more plants than anything else.', color:'#2d6a4f' },
-  { icon:'💡', title:'Light First, Water Second', tip:'Assess your light conditions before buying any plant. Even drought-tolerant plants fail without adequate light.', color:'#d4860a' },
-  { icon:'🌡️', title:'Acclimatize New Plants', tip:'New plants need 1–2 weeks to adjust. Keep them away from other plants to watch for pests, and don\'t repot immediately.', color:'#3a86b4' },
-  { icon:'📅', title:'Seasonal Routine', tip:'Water more in summer, less in winter. Most plants rest during winter and don\'t need fertilizer from October to February.', color:'#7b5ea7' },
-  { icon:'🔬', title:'Inspect Weekly', tip:'Check the undersides of leaves weekly. Catching pests early (spider mites, mealybugs) prevents an infestation.', color:'#c0485a' },
-  { icon:'✂️', title:'Dead-head Regularly', tip:'Remove spent flowers and yellow leaves promptly. Dead plant material invites fungus and wastes the plant\'s energy.', color:'#52b788' },
+const GROWING_TIPS = (t) => [
+  { icon:'🪴', title:t.gtPotTitle||'Choose the Right Pot', tip:t.gtPotTip||'Always use pots with drainage holes.', color:'#2d6a4f' },
+  { icon:'💡', title:t.gtLightTitle||'Light First, Water Second', tip:t.gtLightTip||'Assess your light conditions before buying any plant.', color:'#d4860a' },
+  { icon:'🌡️', title:t.gtNewTitle||'Acclimatize New Plants', tip:t.gtNewTip||'New plants need 1–2 weeks to adjust.', color:'#3a86b4' },
+  { icon:'📅', title:t.gtSeasonTitle||'Seasonal Routine', tip:t.gtSeasonTip||'Water more in summer, less in winter.', color:'#7b5ea7' },
+  { icon:'🔬', title:t.gtInspectTitle||'Inspect Weekly', tip:t.gtInspectTip||'Check the undersides of leaves weekly.', color:'#c0485a' },
+  { icon:'✂️', title:t.gtDeadTitle||'Dead-head Regularly', tip:t.gtDeadTip||'Remove spent flowers and yellow leaves promptly.', color:'#52b788' },
 ];
 
-function GrowingTips() {
+function GrowingTips({ t }) {
   const [open, setOpen] = useState(null);
+  const tips = GROWING_TIPS(t);
   return (
     <section style={{...hv.section,marginBottom:24}} className="animate-fadeUp">
       <div style={hv.secRow}>
-        <h2 style={hv.secTitle}>📚 Growing Tips</h2>
-        <span style={hv.secSub}>Tap to expand</span>
+        <h2 style={hv.secTitle}>{t.growingTips||'📚 Growing Tips'}</h2>
+        <span style={hv.secSub}>{t.tapToExpand||'Tap to expand'}</span>
       </div>
       <div style={{display:'flex',flexDirection:'column',gap:8}}>
-        {GROWING_TIPS.map((tip,i)=>(
+        {tips.map((tip,i)=>(
           <div key={i} style={{
             background:'var(--surface)', border:`1px solid ${open===i?tip.color+'50':'var(--border)'}`,
             borderRadius:14, overflow:'hidden',
@@ -442,21 +444,21 @@ function GrowingTips() {
     </section>
   );
 }
-function SeasonBanner() {
+function SeasonBanner({ t }) {
   const month = new Date().getMonth();
   const seasons = [
-    {name:'Winter',  icon:'❄️', tip:'Reduce watering frequency. Most plants are dormant. Keep away from cold windows.', color:'#3a86b4'},
-    {name:'Winter',  icon:'❄️', tip:'Reduce watering frequency. Most plants are dormant. Keep away from cold windows.', color:'#3a86b4'},
-    {name:'Spring',  icon:'🌸', tip:'Start fertilizing again! Repot root-bound plants. Great time to propagate.', color:'#c0485a'},
-    {name:'Spring',  icon:'🌸', tip:'Start fertilizing again! Repot root-bound plants. Great time to propagate.', color:'#c0485a'},
-    {name:'Spring',  icon:'🌸', tip:'Start fertilizing again! Repot root-bound plants. Great time to propagate.', color:'#c0485a'},
-    {name:'Summer',  icon:'☀️', tip:'Water more frequently. Watch for pests. Protect from harsh afternoon sun.', color:'#d4860a'},
-    {name:'Summer',  icon:'☀️', tip:'Water more frequently. Watch for pests. Protect from harsh afternoon sun.', color:'#d4860a'},
-    {name:'Summer',  icon:'☀️', tip:'Water more frequently. Watch for pests. Protect from harsh afternoon sun.', color:'#d4860a'},
-    {name:'Autumn',  icon:'🍂', tip:'Slow down fertilizing. Bring outdoor plants inside before frost.', color:'#c0485a'},
-    {name:'Autumn',  icon:'🍂', tip:'Slow down fertilizing. Bring outdoor plants inside before frost.', color:'#c0485a'},
-    {name:'Autumn',  icon:'🍂', tip:'Slow down fertilizing. Bring outdoor plants inside before frost.', color:'#c0485a'},
-    {name:'Winter',  icon:'❄️', tip:'Reduce watering frequency. Most plants are dormant. Keep away from cold windows.', color:'#3a86b4'},
+    {name:t.winterName||'Winter', icon:'❄️', tip:t.winterTip||'Reduce watering. Plants are dormant.', color:'#3a86b4'},
+    {name:t.winterName||'Winter', icon:'❄️', tip:t.winterTip||'Reduce watering. Plants are dormant.', color:'#3a86b4'},
+    {name:t.springName||'Spring', icon:'🌸', tip:t.springTip||'Start fertilizing! Great time to propagate.', color:'#c0485a'},
+    {name:t.springName||'Spring', icon:'🌸', tip:t.springTip||'Start fertilizing! Great time to propagate.', color:'#c0485a'},
+    {name:t.springName||'Spring', icon:'🌸', tip:t.springTip||'Start fertilizing! Great time to propagate.', color:'#c0485a'},
+    {name:t.summerName||'Summer', icon:'☀️', tip:t.summerTip||'Water more. Watch for pests.', color:'#d4860a'},
+    {name:t.summerName||'Summer', icon:'☀️', tip:t.summerTip||'Water more. Watch for pests.', color:'#d4860a'},
+    {name:t.summerName||'Summer', icon:'☀️', tip:t.summerTip||'Water more. Watch for pests.', color:'#d4860a'},
+    {name:t.autumnName||'Autumn', icon:'🍂', tip:t.autumnTip||'Slow fertilizing. Bring plants inside.', color:'#c0485a'},
+    {name:t.autumnName||'Autumn', icon:'🍂', tip:t.autumnTip||'Slow fertilizing. Bring plants inside.', color:'#c0485a'},
+    {name:t.autumnName||'Autumn', icon:'🍂', tip:t.autumnTip||'Slow fertilizing. Bring plants inside.', color:'#c0485a'},
+    {name:t.winterName||'Winter', icon:'❄️', tip:t.winterTip||'Reduce watering. Plants are dormant.', color:'#3a86b4'},
   ];
   const s = seasons[month];
   return (
@@ -464,7 +466,7 @@ function SeasonBanner() {
       <div style={sb.left}>
         <span style={sb.icon}>{s.icon}</span>
         <div>
-          <p style={sb.label}>{s.name} Care Tip</p>
+          <p style={sb.label}>{s.name} {t.seasonCareTip||'Care Tip'}</p>
           <p style={sb.tip}>{s.tip}</p>
         </div>
       </div>
@@ -581,7 +583,7 @@ const pg = {
   root:    {minHeight:'100vh',background:'var(--bg)',display:'flex',flexDirection:'column'},
   nav:     {position:'sticky',top:0,zIndex:100,background:'var(--nav-bg)',backdropFilter:'blur(20px)',WebkitBackdropFilter:'blur(20px)',borderBottom:'1px solid var(--border)',height:58,display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 20px',flexShrink:0},
   brand:   {display:'flex',alignItems:'center',gap:10,background:'none',border:'none',cursor:'pointer',padding:0},
-  brandTxt:{fontFamily:"'DM Serif Display',Georgia,serif",fontSize:20,fontWeight:700,color:'var(--text-1)',letterSpacing:'-0.02em'},
+  brandTxt:{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:19,fontWeight:800,color:'var(--text-1)',letterSpacing:'-0.03em'},
   navR:    {display:'flex',alignItems:'center',gap:6},
   langPill:{display:'flex',background:'var(--surface-2)',borderRadius:100,padding:3,gap:2,border:'1px solid var(--border-2)'},
   langBtn: {padding:'4px 10px',borderRadius:100,border:'none',background:'transparent',cursor:'pointer',fontSize:12,fontWeight:600,color:'var(--text-3)',transition:'all 0.18s',fontFamily:"'Plus Jakarta Sans',sans-serif"},
