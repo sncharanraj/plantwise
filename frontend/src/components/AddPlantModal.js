@@ -139,9 +139,9 @@ export default function AddPlantModal({ userId, onClose, onPlantAdded }) {
         {step===STEPS.LOADING&&(
           <div style={s.lb}>
             <div style={{fontSize:64,marginBottom:24}}>🌱</div>
-            <div className="animate-pulse" style={{fontFamily:'"Cormorant Garamond",Georgia,serif',fontSize:20,color:'var(--olive)',marginBottom:20}}>{statusMsg}</div>
+            <div className="animate-pulse" style={{fontFamily:'"Syne",sans-serif',fontSize:20,color:'var(--olive)',marginBottom:20}}>{statusMsg}</div>
             <div style={{height:4,background:'var(--border)',borderRadius:2,overflow:'hidden',maxWidth:300,margin:'0 auto 16px'}}>
-              <div className="animate-pulse" style={{height:'100%',width:'70%',background:'linear-gradient(90deg,var(--olive-mid),var(--olive-lite))',borderRadius:2}}/>
+              <div className="animate-pulse" style={{height:'100%',width:'70%',background:'linear-gradient(90deg,var(--green-mid),var(--green-lite))',borderRadius:2}}/>
             </div>
             <p style={{color:'var(--text-3)',fontSize:14}}>{t.generatingAINote}</p>
           </div>
@@ -155,27 +155,27 @@ const s = {
   overlay:{position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',backdropFilter:'blur(4px)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:1000,padding:24},
   modal:{background:'white',borderRadius:24,width:'100%',maxWidth:520,maxHeight:'90vh',overflow:'auto',boxShadow:'0 32px 80px rgba(0,0,0,0.2)'},
   hdr:{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'24px 28px 0'},
-  ttl:{fontFamily:'"Cormorant Garamond",Georgia,serif',fontSize:24,fontWeight:600},
+  ttl:{fontFamily:'"Syne",sans-serif',fontSize:24,fontWeight:600},
   cls:{background:'none',border:'none',cursor:'pointer',fontSize:18,color:'var(--text-3)',padding:4},
   prog:{display:'flex',gap:6,padding:'16px 28px 0'},
   dot:{height:4,flex:1,borderRadius:2,background:'var(--border)'},
-  dotA:{background:'var(--olive-mid)'},
+  dotA:{background:'var(--green-mid)'},
   body:{padding:'20px 28px 28px'},
   sub:{color:'var(--text-2)',marginBottom:20,fontSize:15},
   err:{background:'rgba(192,57,43,0.08)',border:'1px solid rgba(192,57,43,0.2)',borderRadius:10,padding:'12px 16px',marginBottom:16,color:'var(--danger)',fontSize:14},
   mgrid:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16},
   mc:{background:'var(--surface-2)',border:'2px solid var(--border)',borderRadius:16,padding:24,cursor:'pointer',textAlign:'center',transition:'all 0.2s'},
   mi:{fontSize:36,display:'block',marginBottom:12},
-  mt:{fontFamily:'"Cormorant Garamond",Georgia,serif',fontSize:18,marginBottom:8,color:'var(--text-1)'},
+  mt:{fontFamily:'"Syne",sans-serif',fontSize:18,marginBottom:8,color:'var(--text-1)'},
   md:{fontSize:13,color:'var(--text-3)'},
-  dz:{border:'2px dashed var(--olive-lite)',borderRadius:16,padding:40,textAlign:'center',cursor:'pointer',marginBottom:20,background:'rgba(127,184,150,0.05)'},
+  dz:{border:'2px dashed var(--green-lite)',borderRadius:16,padding:40,textAlign:'center',cursor:'pointer',marginBottom:20,background:'rgba(127,184,150,0.05)'},
   prev:{width:'100%',height:200,objectFit:'cover',borderRadius:14,display:'block'},
   br:{display:'flex',gap:12,justifyContent:'space-between',marginTop:24},
   rc:{border:'2px solid var(--border)',borderRadius:14,padding:'14px 18px',marginBottom:10,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'space-between',transition:'all 0.2s'},
-  rcs:{borderColor:'var(--olive-mid)',background:'rgba(74,124,89,0.04)'},
+  rcs:{borderColor:'var(--green-mid)',background:'rgba(74,124,89,0.04)'},
   ac:{opacity:0.8},
   rl:{display:'flex',alignItems:'center',gap:12},
-  ck:{width:22,height:22,borderRadius:'50%',background:'var(--olive-mid)',color:'white',display:'flex',alignItems:'center',justifyContent:'center',fontSize:12,fontWeight:700,flexShrink:0},
+  ck:{width:22,height:22,borderRadius:'50%',background:'var(--green-mid)',color:'white',display:'flex',alignItems:'center',justifyContent:'center',fontSize:12,fontWeight:700,flexShrink:0},
   rn:{fontWeight:600,fontSize:16,color:'var(--text-1)'},
   rs:{fontSize:13,fontStyle:'italic',color:'var(--text-3)',marginTop:2},
   cb:{padding:'4px 10px',borderRadius:100,fontSize:13,fontWeight:600,color:'var(--text-2)'},

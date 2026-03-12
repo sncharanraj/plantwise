@@ -114,7 +114,7 @@ export default function SettingsPanel({ onClose }) {
               <button key={item.key} style={s.mi} onClick={()=>setSection(item.key)}>
                 <span style={{...s.micon,...(item.danger?{background:'rgba(193,98,63,0.1)'}:{})}}>{item.icon}</span>
                 <div style={{flex:1,textAlign:'left'}}>
-                  <p style={{...s.mlbl,...(item.danger?{color:'var(--terra)'}:{})}}>{item.label}</p>
+                  <p style={{...s.mlbl,...(item.danger?{color:'var(--rose)'}:{})}}>{item.label}</p>
                   <p style={s.msub}>{item.sub}</p>
                 </div>
                 <span style={s.marr}>›</span>
@@ -192,13 +192,13 @@ export default function SettingsPanel({ onClose }) {
           <div style={s.body}>
             <div style={s.warnBox}>
               <p style={{fontSize:36,marginBottom:10}}>⚠️</p>
-              <p style={{fontWeight:600,color:'var(--terra)',marginBottom:6,fontSize:16}}>{t.cannotBeUndone}</p>
+              <p style={{fontWeight:600,color:'var(--rose)',marginBottom:6,fontSize:16}}>{t.cannotBeUndone}</p>
               <p style={{fontSize:14,color:'var(--text-2)',lineHeight:1.6}}>{t.deleteWarning}</p>
             </div>
             <div style={s.field}>
               <label style={s.lbl}>{t.typeDeleteToConfirm}</label>
               <input className="input" value={deleteConfirm} onChange={e=>setDeleteConfirm(e.target.value)} placeholder="DELETE"
-                style={{borderColor:deleteConfirm==='DELETE'?'var(--terra)':undefined}}/>
+                style={{borderColor:deleteConfirm==='DELETE'?'var(--rose)':undefined}}/>
             </div>
             <button style={{...s.delBtn,opacity:deleteConfirm==='DELETE'?1:0.45}} onClick={deleteAccount} disabled={deleteConfirm!=='DELETE'||deleteLoading}>
               {deleteLoading?<span className="spinner"/>:t.deleteAccountBtn}
@@ -212,7 +212,7 @@ export default function SettingsPanel({ onClose }) {
 
 function Msg({ text }) {
   const ok = text.startsWith('✓');
-  return <div style={{padding:'10px 14px',borderRadius:10,fontSize:14,background:ok?'rgba(90,110,68,0.09)':'rgba(193,98,63,0.09)',color:ok?'var(--olive-mid)':'var(--terra)',border:`1px solid ${ok?'rgba(90,110,68,0.2)':'rgba(193,98,63,0.2)'}`}}>{text}</div>;
+  return <div style={{padding:'10px 14px',borderRadius:10,fontSize:14,background:ok?'rgba(90,110,68,0.09)':'rgba(193,98,63,0.09)',color:ok?'var(--green-mid)':'var(--rose)',border:`1px solid ${ok?'rgba(90,110,68,0.2)':'rgba(193,98,63,0.2)'}`}}>{text}</div>;
 }
 
 const s = {
@@ -220,9 +220,9 @@ const s = {
   /* Slide FROM LEFT — fixed left side panel */
   panel:    {position:'fixed',top:0,left:0,bottom:0,width:'min(380px,92vw)',background:'var(--surface)',zIndex:201,display:'flex',flexDirection:'column',boxShadow:'8px 0 48px rgba(0,0,0,0.2)',overflowY:'auto'},
   hdr:      {display:'flex',alignItems:'center',gap:14,padding:'20px 20px 16px',borderBottom:'1px solid var(--border)',flexShrink:0},
-  avatar:   {width:44,height:44,borderRadius:'50%',background:'linear-gradient(135deg,var(--olive),var(--olive-mid))',color:'var(--text-inv)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:18,fontWeight:700,flexShrink:0},
+  avatar:   {width:44,height:44,borderRadius:'50%',background:'linear-gradient(135deg,var(--green),var(--green-mid))',color:'var(--text-inv)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:18,fontWeight:700,flexShrink:0},
   backBtn:  {width:36,height:36,borderRadius:10,background:'var(--surface-2)',border:'1px solid var(--border-mid)',cursor:'pointer',fontSize:18,color:'var(--text-2)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0},
-  ttl:      {fontFamily:"'Cormorant Garamond',Georgia,serif",fontSize:20,fontWeight:600,color:'var(--text-1)'},
+  ttl:      {fontFamily:"'Syne',sans-serif",fontSize:20,fontWeight:600,color:'var(--text-1)'},
   email:    {fontSize:12,color:'var(--text-3)',marginTop:2},
   cls:      {background:'none',border:'none',cursor:'pointer',fontSize:18,color:'var(--text-3)',padding:4,flexShrink:0},
   scroll:   {flex:1,overflowY:'auto',paddingBottom:32},
@@ -245,9 +245,9 @@ const s = {
   tlbl:     {fontSize:15,fontWeight:500,color:'var(--text-1)',marginBottom:2},
   tsub:     {fontSize:12,color:'var(--text-3)'},
   sw:       {width:46,height:26,borderRadius:13,background:'var(--border-mid)',position:'relative',cursor:'pointer',transition:'background 0.22s',flexShrink:0},
-  swOn:     {background:'var(--olive-mid)'},
+  swOn:     {background:'var(--green-mid)'},
   swThumb:  {position:'absolute',top:3,left:3,width:20,height:20,borderRadius:'50%',background:'white',boxShadow:'0 1px 4px rgba(0,0,0,0.18)',transition:'left 0.22s'},
   swThumbOn:{left:23},
   warnBox:  {background:'rgba(193,98,63,0.06)',border:'1px solid rgba(193,98,63,0.15)',borderRadius:14,padding:'20px',textAlign:'center'},
-  delBtn:   {width:'100%',padding:'14px',background:'var(--terra)',color:'white',border:'none',borderRadius:12,cursor:'pointer',fontSize:15,fontWeight:600,display:'flex',alignItems:'center',justifyContent:'center',gap:8,transition:'opacity 0.2s'},
+  delBtn:   {width:'100%',padding:'14px',background:'var(--rose)',color:'white',border:'none',borderRadius:12,cursor:'pointer',fontSize:15,fontWeight:600,display:'flex',alignItems:'center',justifyContent:'center',gap:8,transition:'opacity 0.2s'},
 };

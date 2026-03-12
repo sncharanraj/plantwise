@@ -172,7 +172,7 @@ function CareTab({ cg, t }) {
       <div style={{display:'flex',flexDirection:'column',gap:10}}>
         {sec.data.map((p,i) => (
           <div key={i} style={det.pest}>
-            <p style={{fontWeight:700,fontSize:14,color:'var(--gold)',marginBottom:8}}>🐛 {p.pest}</p>
+            <p style={{fontWeight:700,fontSize:14,color:'var(--amber)',marginBottom:8}}>🐛 {p.pest}</p>
             {p.symptoms  && <div style={det.row}><span style={det.lbl}>{t.fSymptoms||'Symptoms'}</span><span style={det.val}>{p.symptoms}</span></div>}
             {p.treatment && <div style={det.row}><span style={det.lbl}>{t.fTreatment||'Treatment'}</span><span style={det.val}>{p.treatment}</span></div>}
           </div>
@@ -185,11 +185,11 @@ function CareTab({ cg, t }) {
         {sec.data.map((ti,i) => (
           <div key={i} style={{display:'flex',gap:14,marginBottom:18}}>
             <div style={{display:'flex',flexDirection:'column',alignItems:'center',flexShrink:0}}>
-              <div style={{width:12,height:12,borderRadius:'50%',background:'var(--olive-lite)',border:'2px solid var(--olive-mid)',flexShrink:0,marginTop:3}}/>
+              <div style={{width:12,height:12,borderRadius:'50%',background:'var(--green-lite)',border:'2px solid var(--green-mid)',flexShrink:0,marginTop:3}}/>
               {i < sec.data.length-1 && <div style={{width:2,flex:1,background:'var(--border)',marginTop:4,minHeight:20}}/>}
             </div>
             <div style={{paddingBottom:4}}>
-              <p style={{fontWeight:700,fontSize:13,color:'var(--olive-lite)',marginBottom:3}}>{ti.period}</p>
+              <p style={{fontWeight:700,fontSize:13,color:'var(--green-lite)',marginBottom:3}}>{ti.period}</p>
               <p style={{fontSize:14,color:'var(--text-2)',lineHeight:1.6}}>{ti.expectation}</p>
             </div>
           </div>
@@ -207,7 +207,7 @@ function CareTab({ cg, t }) {
             <p style={{fontSize:12,color:'var(--text-3)',textTransform:'uppercase',letterSpacing:0.5,marginBottom:8}}>{t.fSteps||'Steps'}</p>
             {sec.data.steps.map((step,i) => (
               <p key={i} style={{fontSize:14,color:'var(--text-2)',marginBottom:8,lineHeight:1.6}}>
-                <strong style={{color:'var(--olive-lite)'}}>{i+1}. </strong>{step}
+                <strong style={{color:'var(--green-lite)'}}>{i+1}. </strong>{step}
               </p>
             ))}
           </div>
@@ -386,11 +386,11 @@ function JournalTab({ plantId, userId, t }) {
   return (
     <div style={{padding:'20px 0'}}>
       <div className="card animate-fadeUp" style={{padding:'20px 24px',marginBottom:24}}>
-        <h3 style={{fontFamily:'"Cormorant Garamond",Georgia,serif',fontSize:18,fontWeight:600,marginBottom:14,color:'var(--olive-lite)'}}>📝 {t.logToday||'Log Today'}</h3>
+        <h3 style={{fontFamily:'"Syne",sans-serif',fontSize:18,fontWeight:600,marginBottom:14,color:'var(--green-lite)'}}>📝 {t.logToday||'Log Today'}</h3>
         <textarea className="input" placeholder={t.journalPlaceholder||"What's happening with your plant today?"} value={note} onChange={e=>setNote(e.target.value)} rows={3} style={{resize:'vertical',marginBottom:12}}/>
         {imagePreview && <img src={imagePreview} alt="log" style={{width:'100%',maxHeight:180,objectFit:'cover',borderRadius:10,marginBottom:12}}/>}
         <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-          <label style={{fontSize:14,color:'var(--olive-lite)',cursor:'pointer',fontWeight:500}}>📷 {t.addPhoto||'Add photo'}
+          <label style={{fontSize:14,color:'var(--green-lite)',cursor:'pointer',fontWeight:500}}>📷 {t.addPhoto||'Add photo'}
             <input type="file" accept="image/*" style={{display:'none'}} onChange={e=>{const f=e.target.files[0];if(f){setImageFile(f);setImagePreview(URL.createObjectURL(f));}}}/>
           </label>
           <button className="btn btn-primary btn-sm" onClick={addEntry} disabled={saving||!note.trim()}>{saving?<span className="spinner"/>:(t.saveEntry||'Save Entry')}</button>
@@ -404,7 +404,7 @@ function JournalTab({ plantId, userId, t }) {
             {entries.map(e => (
               <div key={e.id} style={{display:'flex',gap:14}} className="animate-fadeUp">
                 <div style={{display:'flex',flexDirection:'column',alignItems:'center',flexShrink:0,paddingTop:16}}>
-                  <div style={{width:10,height:10,borderRadius:'50%',background:'var(--olive-lite)',border:'2px solid var(--olive-mid)'}}/>
+                  <div style={{width:10,height:10,borderRadius:'50%',background:'var(--green-lite)',border:'2px solid var(--green-mid)'}}/>
                 </div>
                 <div style={{flex:1,background:'var(--surface)',border:'1px solid var(--border)',borderRadius:14,padding:'14px 18px'}}>
                   <div style={{display:'flex',justifyContent:'space-between',marginBottom:8}}>
@@ -427,34 +427,34 @@ const s = {
   hdr:   {position:'relative',height:280},
   hbg:   {position:'absolute',inset:0},
   himg:  {width:'100%',height:'100%',objectFit:'cover'},
-  hph:   {width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center',background:'linear-gradient(135deg,var(--olive),var(--olive-mid))'},
+  hph:   {width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center',background:'linear-gradient(135deg,var(--green),var(--green-mid))'},
   hov:   {position:'absolute',inset:0,background:'linear-gradient(to top,rgba(0,0,0,0.85),rgba(0,0,0,0.2) 60%,transparent)'},
   hcon:  {position:'absolute',inset:0,display:'flex',flexDirection:'column',justifyContent:'space-between',padding:'20px 24px'},
   back:  {background:'rgba(255,255,255,0.12)',backdropFilter:'blur(8px)',border:'1px solid rgba(255,255,255,0.15)',color:'white',padding:'8px 16px',borderRadius:100,cursor:'pointer',fontSize:14,alignSelf:'flex-start'},
-  pname: {fontFamily:'"Cormorant Garamond",Georgia,serif',fontSize:32,fontWeight:600,color:'white',textShadow:'0 2px 12px rgba(0,0,0,0.4)'},
+  pname: {fontFamily:'"Syne",sans-serif',fontSize:32,fontWeight:600,color:'white',textShadow:'0 2px 12px rgba(0,0,0,0.4)'},
   sci:   {fontStyle:'italic',color:'rgba(255,255,255,0.75)',fontSize:15,marginBottom:10},
   badges:{display:'flex',gap:8,flexWrap:'wrap'},
   tabs:  {display:'flex',background:'var(--bg)',borderBottom:'1px solid var(--border)',position:'sticky',top:0,zIndex:50},
-  tab:   {flex:1,padding:'14px 12px',background:'none',border:'none',cursor:'pointer',fontSize:14,fontWeight:500,color:'var(--text-3)',transition:'all 0.2s',borderBottom:'2px solid transparent',fontFamily:'"Outfit",system-ui,sans-serif'},
-  taba:  {color:'var(--olive-lite)',borderBottomColor:'var(--olive-lite)',background:'rgba(82,183,136,0.06)'},
+  tab:   {flex:1,padding:'14px 12px',background:'none',border:'none',cursor:'pointer',fontSize:14,fontWeight:500,color:'var(--text-3)',transition:'all 0.2s',borderBottom:'2px solid transparent',fontFamily:'"Manrope",sans-serif'},
+  taba:  {color:'var(--green-lite)',borderBottomColor:'var(--green-lite)',background:'rgba(82,183,136,0.06)'},
   content:{maxWidth:800,margin:'0 auto',padding:'0 16px'},
 };
 const regen = {
   bar:{background:'rgba(82,183,136,0.07)',borderBottom:'1px solid rgba(82,183,136,0.15)',padding:'10px 24px',display:'flex',alignItems:'center',justifyContent:'space-between',gap:12,flexWrap:'wrap'},
   msg:{fontSize:13,color:'var(--text-2)'},
-  btn:{background:'rgba(82,183,136,0.15)',border:'1px solid rgba(82,183,136,0.3)',color:'var(--olive-lite)',borderRadius:100,padding:'7px 16px',fontSize:13,fontWeight:600,cursor:'pointer',whiteSpace:'nowrap',transition:'all 0.2s'},
+  btn:{background:'rgba(82,183,136,0.15)',border:'1px solid rgba(82,183,136,0.3)',color:'var(--green-lite)',borderRadius:100,padding:'7px 16px',fontSize:13,fontWeight:600,cursor:'pointer',whiteSpace:'nowrap',transition:'all 0.2s'},
 };
 const ov = {
   banner:{background:'linear-gradient(135deg,#1a4a35,#0d2a1d)',border:'1px solid rgba(82,183,136,0.2)',borderRadius:16,padding:'20px 24px',marginBottom:20,overflow:'hidden'},
-  text:  {fontSize:15,lineHeight:1.7,color:'rgba(255,255,255,0.88)',fontFamily:'"Cormorant Garamond",Georgia,serif',marginBottom:10},
+  text:  {fontSize:15,lineHeight:1.7,color:'rgba(255,255,255,0.88)',fontFamily:'"Syne",sans-serif',marginBottom:10},
   meta:  {display:'flex',gap:20,fontSize:13,color:'rgba(255,255,255,0.55)'},
 };
 const nav = {
   wrap:      {display:'flex',alignItems:'center',gap:4,marginBottom:16},
-  arr:       {background:'var(--surface)',border:'1px solid var(--border)',borderRadius:10,width:34,height:34,display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',fontSize:20,color:'var(--olive-lite)',flexShrink:0,fontWeight:700,transition:'all 0.2s'},
+  arr:       {background:'var(--surface)',border:'1px solid var(--border)',borderRadius:10,width:34,height:34,display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',fontSize:20,color:'var(--green-lite)',flexShrink:0,fontWeight:700,transition:'all 0.2s'},
   scroll:    {display:'flex',gap:8,overflowX:'auto',flex:1,scrollbarWidth:'none',msOverflowStyle:'none',paddingBottom:2},
   chip:      {display:'flex',flexDirection:'column',alignItems:'center',gap:3,padding:'10px 14px',borderRadius:14,border:'1px solid var(--border)',background:'var(--surface)',cursor:'pointer',minWidth:80,flexShrink:0,transition:'all 0.2s',textAlign:'center'},
-  chipActive:{border:'1px solid var(--olive-lite)',background:'rgba(82,183,136,0.12)',boxShadow:'0 0 0 1px rgba(82,183,136,0.2)'},
+  chipActive:{border:'1px solid var(--green-lite)',background:'rgba(82,183,136,0.12)',boxShadow:'0 0 0 1px rgba(82,183,136,0.2)'},
   chipLabel: {fontSize:12,fontWeight:600,color:'var(--text-1)',whiteSpace:'nowrap'},
   chipSub:   {fontSize:11,color:'var(--text-3)',whiteSpace:'nowrap',maxWidth:80,overflow:'hidden',textOverflow:'ellipsis'},
 };
@@ -462,7 +462,7 @@ const det = {
   panel: {background:'var(--surface)',border:'1px solid var(--border-mid)',borderRadius:16,padding:'20px 22px',animation:'fadeUp 0.25s ease forwards'},
   hdr:   {display:'flex',alignItems:'center',gap:12},
   iconWrap:{width:40,height:40,borderRadius:12,background:'rgba(82,183,136,0.12)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:20,flexShrink:0},
-  title: {fontFamily:'"Cormorant Garamond",Georgia,serif',fontSize:18,fontWeight:600,color:'var(--text-1)'},
+  title: {fontFamily:'"Syne",sans-serif',fontSize:18,fontWeight:600,color:'var(--text-1)'},
   sub:   {fontSize:13,color:'var(--text-3)',marginTop:2},
   row:   {display:'flex',justifyContent:'space-between',padding:'9px 0',borderBottom:'1px solid rgba(82,183,136,0.06)',gap:16},
   lbl:   {fontSize:13,color:'var(--text-3)',flexShrink:0,textTransform:'capitalize'},
@@ -476,10 +476,10 @@ const ch = {
   msgs: {flex:1,overflow:'auto',padding:'16px 0',display:'flex',flexDirection:'column',gap:14},
   row:  {display:'flex',gap:10,alignItems:'flex-start'},
   rowu: {flexDirection:'row-reverse'},
-  av:   {width:32,height:32,borderRadius:'50%',background:'linear-gradient(135deg,var(--olive-mid),var(--olive-lite))',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,fontSize:16},
+  av:   {width:32,height:32,borderRadius:'50%',background:'linear-gradient(135deg,var(--green-mid),var(--green-lite))',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,fontSize:16},
   bub:  {maxWidth:'75%',padding:'12px 16px',borderRadius:18,fontSize:15,lineHeight:1.6},
   buba: {background:'var(--surface)',border:'1px solid var(--border)',borderTopLeftRadius:4,color:'var(--text-1)'},
-  bubu: {background:'linear-gradient(135deg,var(--olive-mid),var(--olive-lite))',color:'var(--olive)',fontWeight:500,borderTopRightRadius:4},
+  bubu: {background:'linear-gradient(135deg,var(--green-mid),var(--green-lite))',color:'var(--green)',fontWeight:500,borderTopRightRadius:4},
   sugg: {display:'flex',gap:8,flexWrap:'wrap',padding:'10px 0'},
   sb:   {background:'var(--surface)',border:'1px solid var(--border)',borderRadius:100,padding:'8px 14px',fontSize:13,cursor:'pointer',color:'var(--text-2)'},
   ir:   {display:'flex',gap:10,padding:'14px 0 8px'},
