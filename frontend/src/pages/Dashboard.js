@@ -10,27 +10,26 @@ import SettingsPanel from '../components/SettingsPanel';
 
 const LANG_NAMES = { en:'EN', hi:'हि', kn:'ಕ' };
 
-/* ── Sunflower SVG ── */
-function SunflowerSVG({ size=28 }) {
+/* ── Monstera Leaf Logo ── */
+function PlantLogo({ size=28 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-      {/* Outer petals */}
-      {Array.from({length:12}).map((_,i)=>{
-        const a=(i*30)*Math.PI/180, cx=40+Math.cos(a)*24, cy=40+Math.sin(a)*24;
-        return <ellipse key={`o${i}`} cx={cx} cy={cy} rx="6.5" ry="12" fill="#f4c542" opacity="0.95" transform={`rotate(${i*30} ${cx} ${cy})`}/>;
-      })}
-      {/* Inner petals offset */}
-      {Array.from({length:12}).map((_,i)=>{
-        const a=((i*30)+15)*Math.PI/180, cx=40+Math.cos(a)*20, cy=40+Math.sin(a)*20;
-        return <ellipse key={`i${i}`} cx={cx} cy={cy} rx="4" ry="9" fill="#e8a020" opacity="0.7" transform={`rotate(${i*30+15} ${cx} ${cy})`}/>;
-      })}
-      {/* Dark center */}
-      <circle cx="40" cy="40" r="14" fill="#3d1f00"/>
-      <circle cx="40" cy="40" r="11" fill="#2a1200"/>
-      {/* Seed dots */}
-      {[[36,36],[40,34],[44,36],[46,40],[44,44],[40,46],[36,44],[34,40],[40,40],[38,38],[42,38],[42,42],[38,42]].map(([x,y],i)=>(
-        <circle key={i} cx={x} cy={y} r="1.3" fill="#6b3a00" opacity="0.85"/>
-      ))}
+      {/* Main leaf shape */}
+      <path d="M40 8 C20 8 10 22 12 42 C14 58 26 70 40 72 C54 70 66 58 68 42 C70 22 60 8 40 8Z"
+        fill="var(--green-mid)" opacity="0.9"/>
+      {/* Leaf holes - characteristic monstera fenestrations */}
+      <ellipse cx="30" cy="38" rx="6" ry="9" fill="var(--bg)" opacity="0.85" transform="rotate(-15 30 38)"/>
+      <ellipse cx="50" cy="38" rx="6" ry="9" fill="var(--bg)" opacity="0.85" transform="rotate(15 50 38)"/>
+      <ellipse cx="40" cy="55" rx="5" ry="7" fill="var(--bg)" opacity="0.85"/>
+      {/* Center vein */}
+      <path d="M40 12 L40 68" stroke="var(--bg)" strokeWidth="1.5" opacity="0.5" strokeLinecap="round"/>
+      {/* Side veins */}
+      <path d="M40 28 L20 20" stroke="var(--bg)" strokeWidth="1" opacity="0.4" strokeLinecap="round"/>
+      <path d="M40 28 L60 20" stroke="var(--bg)" strokeWidth="1" opacity="0.4" strokeLinecap="round"/>
+      <path d="M40 44 L16 38" stroke="var(--bg)" strokeWidth="1" opacity="0.4" strokeLinecap="round"/>
+      <path d="M40 44 L64 38" stroke="var(--bg)" strokeWidth="1" opacity="0.4" strokeLinecap="round"/>
+      {/* Stem */}
+      <path d="M40 72 L40 78" stroke="var(--green)" strokeWidth="3" strokeLinecap="round"/>
     </svg>
   );
 }
@@ -98,7 +97,7 @@ export default function Dashboard() {
       {/* ─── NAV ─── */}
       <nav style={pg.nav}>
         <button style={pg.brand} onClick={()=>setView('home')}>
-          <SunflowerSVG size={28}/>
+          <PlantLogo size={28}/>
           <span style={pg.brandTxt}>PlantWise</span>
         </button>
         <div style={pg.navR}>
@@ -133,8 +132,8 @@ export default function Dashboard() {
           ))}
           <div style={sd.divider}/>
           <button style={{...sd.btn,...sd.addBtn}} onClick={()=>setShowAdd(true)}>
-            <span style={sd.addIcon}>+</span>
-            <span style={sd.label}>{t.addPlant||'Add Plant'}</span>
+            <span style={sd.addIcon}>🌱</span>
+            <span style={sd.label}>{(t.addPlant||'Add Plant').replace(/^\+\s*/,'')}</span>
           </button>
           <button style={sd.btn} onClick={()=>setShowSettings(true)}>
             <span style={sd.icon}>⚙️</span>
@@ -216,8 +215,8 @@ function HomeView({ user, plants, loading, t, tn, dc, lang, onGarden, onAdd, onP
       <div style={hv.hero} className="animate-fadeUp">
         {/* Floating orbs */}
         <div style={hv.orb1} className="animate-float"/>
-        <div style={hv.orb2} className="animate-float" style={{...hv.orb2,animationDelay:'1.5s'}}/>
-        <div style={hv.orb3} className="animate-float" style={{...hv.orb3,animationDelay:'0.8s'}}/>
+        <div style={{...hv.orb2,animationDelay:'1.5s'}} className="animate-float"/>
+        <div style={{...hv.orb3,animationDelay:'0.8s'}} className="animate-float"/>
 
         <div style={hv.heroContent}>
           <div style={hv.heroLeft}>
@@ -266,15 +265,8 @@ function HomeView({ user, plants, loading, t, tn, dc, lang, onGarden, onAdd, onP
       </div>
 
       {/* ── QUICK TIPS (interactive flip cards) ── */}
-      <section style={{...hv.section,animationDelay:'0.1s'}} className="animate-fadeUp">
-        <div style={hv.secRow}>
-          <h2 style={hv.secTitle}>{t.plantTips||'🌿 Plant Tips'}</h2>
-          <span style={hv.secSub}>{t.tapToReveal||'Tap to reveal'}</span>
-        </div>
-        <div style={hv.tipsGrid}>
-          {TIPS(t).map((tip,i)=><FlipTip key={i} {...tip} tapLabel={t.tapToLearn||'Tap to learn more →'} delay={i*0.08}/>)}
-        </div>
-      </section>
+      {/* ── PLANT TIPS CAROUSEL ── */}
+      <PlantTipsCarousel t={t}/>
 
       {/* ── SEASON BANNER ── */}
       <SeasonBanner t={t}/>
@@ -305,6 +297,56 @@ function HomeView({ user, plants, loading, t, tn, dc, lang, onGarden, onAdd, onP
 }
 
 /* ── Flip tip card ── */
+/* ── Plant Tips Carousel (auto-rotate like Plant Facts) ── */
+function PlantTipsCarousel({ t }) {
+  const tips = TIPS(t);
+  const [idx, setIdx] = useState(0);
+  const [anim, setAnim] = useState(true);
+
+  function goTo(i) {
+    setAnim(false);
+    setTimeout(()=>{ setIdx(i); setAnim(true); }, 100);
+  }
+
+  useEffect(()=>{
+    const timer = setInterval(()=>goTo((idx+1)%tips.length), 4000);
+    return ()=>clearInterval(timer);
+  },[idx, tips.length]);
+
+  const tip = tips[idx];
+
+  return (
+    <section style={hv.section} className="animate-fadeUp">
+      <div style={hv.secRow}>
+        <h2 style={hv.secTitle}>{t.plantTips||'🌿 Plant Tips'}</h2>
+        <span style={hv.secSub}>{idx+1} / {tips.length}</span>
+      </div>
+      <div style={{...pf.card, borderLeft:`4px solid ${tip.color}`}}>
+        <div style={pf.tagRow}>
+          <span style={{...pf.tag, background:`${tip.color}18`, color:tip.color, border:`1px solid ${tip.color}30`}}>
+            {tip.icon} {tip.title}
+          </span>
+          <div style={pf.dots}>
+            {tips.map((_,i)=>(
+              <button key={i} style={{...pf.dot,...(i===idx?{...pf.dotOn,background:tip.color}:{})}} onClick={()=>goTo(i)}/>
+            ))}
+          </div>
+        </div>
+        <div style={{...pf.body, opacity:anim?1:0, transform:anim?'translateY(0)':'translateY(8px)', transition:'all 0.2s', alignItems:'center'}}>
+          <div style={{width:56,height:56,borderRadius:16,background:`${tip.color}15`,border:`1px solid ${tip.color}25`,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+            <span style={{fontSize:28}}>{tip.icon}</span>
+          </div>
+          <p style={{...pf.fact, fontSize:15, lineHeight:1.7}}>{tip.back}</p>
+        </div>
+        <div style={pf.arrows}>
+          <button style={pf.arrow} onClick={()=>goTo((idx-1+tips.length)%tips.length)}>←</button>
+          <button style={pf.arrow} onClick={()=>goTo((idx+1)%tips.length)}>→</button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 const TIPS = (t) => [
   {icon:'💧', title:t.tipWateringTitle||'Watering',    front:t.tipWateringFront||'Proper hydration is key to plant health.',  back:t.tipWateringBack||'Check soil moisture 1" deep before watering.',  color:'#3a86b4'},
   {icon:'☀️', title:t.tipSunlightTitle||'Sunlight',   front:t.tipSunlightFront||'Light is food for your plants.',            back:t.tipSunlightBack||'Rotate your plants 90° weekly for even growth.',  color:'#d4860a'},
@@ -314,32 +356,6 @@ const TIPS = (t) => [
   {icon:'🪱', title:t.tipFertTitle||'Fertilizing',    front:t.tipFertFront||'Feed your plants during their growth season.',  back:t.tipFertBack||'Use a balanced NPK fertilizer every 2–4 weeks.',     color:'#5a6e44'},
 ];
 
-function FlipTip({ icon, title, front, back, color, tapLabel, delay=0 }) {
-  const [flipped, setFlipped] = useState(false);
-  return (
-    <div style={{animationDelay:`${delay}s`,cursor:'pointer'}} className="animate-fadeUp" onClick={()=>setFlipped(f=>!f)}>
-      <div style={{
-        background: flipped ? `linear-gradient(145deg,${color}15,${color}08)` : 'var(--surface)',
-        border: `1px solid ${flipped ? color+'40' : 'var(--border-2)'}`,
-        borderRadius:18, padding:'16px',
-        transition:'all 0.35s cubic-bezier(0.22,1,0.36,1)',
-        boxShadow: flipped ? `0 4px 20px ${color}20` : 'var(--shadow-xs)',
-      }}>
-        <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:10}}>
-          <div style={{width:36,height:36,borderRadius:10,display:'flex',alignItems:'center',justifyContent:'center',background:`${color}18`,border:`1px solid ${color}30`,flexShrink:0}}>
-            <span style={{fontSize:20}}>{icon}</span>
-          </div>
-          <p style={{fontSize:13,fontWeight:700,color,letterSpacing:'0.02em'}}>{title}</p>
-          <span style={{marginLeft:'auto',fontSize:14,transition:'transform 0.3s',transform:flipped?'rotate(45deg)':'rotate(0deg)',color:'var(--text-3)'}}>✦</span>
-        </div>
-        <p style={{fontSize:12,color:'var(--text-2)',lineHeight:1.65}}>
-          {flipped ? back : front}
-        </p>
-        {!flipped && <span style={{fontSize:10,color:'var(--text-4)',display:'block',marginTop:8,textAlign:'right'}}>{tapLabel||'Tap to learn more →'}</span>}
-      </div>
-    </div>
-  );
-}
 
 /* ── Plant Facts carousel ── */
 const FACTS = (t) => [
@@ -583,7 +599,7 @@ const pg = {
   root:    {minHeight:'100vh',background:'var(--bg)',display:'flex',flexDirection:'column'},
   nav:     {position:'sticky',top:0,zIndex:100,background:'var(--nav-bg)',backdropFilter:'blur(20px)',WebkitBackdropFilter:'blur(20px)',borderBottom:'1px solid var(--border)',height:58,display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 20px',flexShrink:0},
   brand:   {display:'flex',alignItems:'center',gap:10,background:'none',border:'none',cursor:'pointer',padding:0},
-  brandTxt:{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:19,fontWeight:800,color:'var(--text-1)',letterSpacing:'-0.03em'},
+  brandTxt:{fontFamily:"'DM Serif Display',Georgia,serif",fontSize:20,fontWeight:400,fontStyle:'italic',color:'var(--text-1)',letterSpacing:'0.01em'},
   navR:    {display:'flex',alignItems:'center',gap:6},
   langPill:{display:'flex',background:'var(--surface-2)',borderRadius:100,padding:3,gap:2,border:'1px solid var(--border-2)'},
   langBtn: {padding:'4px 10px',borderRadius:100,border:'none',background:'transparent',cursor:'pointer',fontSize:12,fontWeight:600,color:'var(--text-3)',transition:'all 0.18s',fontFamily:"'Plus Jakarta Sans',sans-serif"},

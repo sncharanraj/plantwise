@@ -120,29 +120,18 @@ function GoogleIcon() {
 }
 
 function SunflowerSVG({ size = 40 }) {
+  // Monstera leaf logo
   return (
     <svg width={size} height={size} viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-      {/* Petals */}
-      {Array.from({length:12}).map((_,i) => {
-        const angle = (i * 30) * Math.PI / 180;
-        const cx = 40 + Math.cos(angle) * 22;
-        const cy = 40 + Math.sin(angle) * 22;
-        return <ellipse key={i} cx={cx} cy={cy} rx="7" ry="11" fill="#f0c97a" opacity="0.92"
-          transform={`rotate(${i*30} ${cx} ${cy})`}/>;
-      })}
-      {/* Center dark */}
-      <circle cx="40" cy="40" r="13" fill="#5a3e1b"/>
-      {/* Center seeds pattern */}
-      <circle cx="40" cy="40" r="10" fill="#3d2a10"/>
-      <circle cx="36" cy="36" r="1.5" fill="#6b4a20" opacity="0.8"/>
-      <circle cx="40" cy="34" r="1.5" fill="#6b4a20" opacity="0.8"/>
-      <circle cx="44" cy="36" r="1.5" fill="#6b4a20" opacity="0.8"/>
-      <circle cx="45" cy="40" r="1.5" fill="#6b4a20" opacity="0.8"/>
-      <circle cx="44" cy="44" r="1.5" fill="#6b4a20" opacity="0.8"/>
-      <circle cx="40" cy="46" r="1.5" fill="#6b4a20" opacity="0.8"/>
-      <circle cx="36" cy="44" r="1.5" fill="#6b4a20" opacity="0.8"/>
-      <circle cx="35" cy="40" r="1.5" fill="#6b4a20" opacity="0.8"/>
-      <circle cx="40" cy="40" r="1.5" fill="#6b4a20" opacity="0.8"/>
+      <path d="M40 8 C20 8 10 22 12 42 C14 58 26 70 40 72 C54 70 66 58 68 42 C70 22 60 8 40 8Z"
+        fill="rgba(255,255,255,0.85)"/>
+      <ellipse cx="30" cy="38" rx="6" ry="9" fill="rgba(45,106,79,0.8)" transform="rotate(-15 30 38)"/>
+      <ellipse cx="50" cy="38" rx="6" ry="9" fill="rgba(45,106,79,0.8)" transform="rotate(15 50 38)"/>
+      <ellipse cx="40" cy="55" rx="5" ry="7" fill="rgba(45,106,79,0.8)"/>
+      <path d="M40 12 L40 68" stroke="rgba(45,106,79,0.5)" strokeWidth="1.5" strokeLinecap="round"/>
+      <path d="M40 28 L20 20M40 28 L60 20M40 44 L16 38M40 44 L64 38"
+        stroke="rgba(45,106,79,0.35)" strokeWidth="1" strokeLinecap="round"/>
+      <path d="M40 72 L40 78" stroke="rgba(45,106,79,0.7)" strokeWidth="3" strokeLinecap="round"/>
     </svg>
   );
 }
