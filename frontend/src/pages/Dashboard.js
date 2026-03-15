@@ -65,7 +65,7 @@ export default function Dashboard() {
   const [filterDiff, setFilterDiff] = useState('All');
 
   useEffect(()=>{ if(user){fetchPlants();fetchNotifs();} },[user]);
-  useEffect(()=>{ if(plants.length>0) translateNames(plants.map(p=>p.plant_name)); },[lang,plants.length]);
+  useEffect(()=>{ if(plants.length>0) translateNames(plants.map(p=>p.plant_name)); },[lang,plants.length,translateNames]);
 
   async function fetchPlants(){
     try{ const r=await getUserPlants(user.id); const d=r.data||[]; setPlants(d); if(d.length) translateNames(d.map(p=>p.plant_name)); }
@@ -216,8 +216,8 @@ function HomeView({ user, plants, loading, t, tn, dc, lang, onGarden, onAdd, onP
       <div style={hv.hero} className="animate-fadeUp">
         {/* Floating orbs */}
         <div style={hv.orb1} className="animate-float"/>
-        <div style={{...hv.orb2,animationDelay:'1.5s'}} className="animate-float"/>
-        <div style={{...hv.orb3,animationDelay:'0.8s'}} className="animate-float"/>
+        <div style={hv.orb2} className="animate-float" style={{...hv.orb2,animationDelay:'1.5s'}}/>
+        <div style={hv.orb3} className="animate-float" style={{...hv.orb3,animationDelay:'0.8s'}}/>
 
         <div style={hv.heroContent}>
           <div style={hv.heroLeft}>

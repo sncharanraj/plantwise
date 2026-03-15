@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useCallback } from 'react';
 
 const translations = {
   en: {
@@ -420,18 +420,22 @@ export function LanguageProvider({ children }) {
 
   const t = translations[lang] || translations.en;
 
-  async function switchLang(l) {
+  function switchLang(l) {
     setLang(l);
     localStorage.setItem('pw_lang', l);
+    // No need to clear cache — each lang has its own key
+    // tn() always checks current lang key, en returns original name
   }
 
   // Call this from Dashboard after plants are loaded, whenever lang changes
-  async function translateNames(englishNames) {
-    if (lang === 'en') return;
+  // Uses currentLang param to avoid stale closure bug
+  const translateNames = useCallback(async (englishNames) => {
+    const currentLang = lang; // capture current lang at call time
+    if (currentLang === 'en') return; // English = use original names, no translation needed
     if (!englishNames?.length) return;
 
     // Filter names not yet cached for current lang
-    const cached = nameCache[lang] || {};
+    const cached = nameCache[currentLang] || {};
     const missing = englishNames.filter(n => !cached[n]);
     if (!missing.length) return;
 
@@ -440,13 +444,13 @@ export function LanguageProvider({ children }) {
       const res = await fetch(`${API_URL}/plants/translate-names`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ names: missing, lang })
+        body: JSON.stringify({ names: missing, lang: currentLang })
       });
       const data = await res.json();
       if (data.success) {
         setNameCache(prev => ({
           ...prev,
-          [lang]: { ...(prev[lang] || {}), ...data.data }
+          [currentLang]: { ...(prev[currentLang] || {}), ...data.data }
         }));
       }
     } catch(e) {
@@ -454,11 +458,12 @@ export function LanguageProvider({ children }) {
     } finally {
       setTranslatingNames(false);
     }
-  }
+  }, [lang, nameCache]);
 
-  // Translate a single name — returns translated or original
+  // Translate a single name — always returns original English name when lang==='en'
   function tn(englishName) {
-    if (lang === 'en' || !englishName) return englishName;
+    if (!englishName) return englishName;
+    if (lang === 'en') return englishName; // Always show English when EN is selected
     return (nameCache[lang] || {})[englishName] || englishName;
   }
 
