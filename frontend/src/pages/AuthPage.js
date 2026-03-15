@@ -120,18 +120,16 @@ function GoogleIcon() {
 }
 
 function SunflowerSVG({ size = 40 }) {
-  // Monstera leaf logo
+  const s = size / 32; // scale factor
   return (
-    <svg width={size} height={size} viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M40 8 C20 8 10 22 12 42 C14 58 26 70 40 72 C54 70 66 58 68 42 C70 22 60 8 40 8Z"
-        fill="rgba(255,255,255,0.85)"/>
-      <ellipse cx="30" cy="38" rx="6" ry="9" fill="rgba(45,106,79,0.8)" transform="rotate(-15 30 38)"/>
-      <ellipse cx="50" cy="38" rx="6" ry="9" fill="rgba(45,106,79,0.8)" transform="rotate(15 50 38)"/>
-      <ellipse cx="40" cy="55" rx="5" ry="7" fill="rgba(45,106,79,0.8)"/>
-      <path d="M40 12 L40 68" stroke="rgba(45,106,79,0.5)" strokeWidth="1.5" strokeLinecap="round"/>
-      <path d="M40 28 L20 20M40 28 L60 20M40 44 L16 38M40 44 L64 38"
-        stroke="rgba(45,106,79,0.35)" strokeWidth="1" strokeLinecap="round"/>
-      <path d="M40 72 L40 78" stroke="rgba(45,106,79,0.7)" strokeWidth="3" strokeLinecap="round"/>
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="10" y="23" width="12" height="7" rx="2" fill="rgba(255,255,255,0.7)" opacity="0.85"/>
+      <rect x="9" y="21" width="14" height="3" rx="1.5" fill="rgba(255,255,255,0.9)"/>
+      <path d="M16 21 L16 13" stroke="rgba(255,255,255,0.9)" strokeWidth="1.8" strokeLinecap="round"/>
+      <path d="M16 17 C16 17 10 15 9 10 C9 10 14 9 16 14" fill="rgba(255,255,255,0.75)"/>
+      <path d="M16 14 C16 14 22 12 23 7 C23 7 18 6 16 11" fill="rgba(255,255,255,0.9)"/>
+      <circle cx="16" cy="12" r="2.5" fill="#f4c542" opacity="0.95"/>
+      <circle cx="16" cy="12" r="1.2" fill="#f7d874" opacity="0.9"/>
     </svg>
   );
 }

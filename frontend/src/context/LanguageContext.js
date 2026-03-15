@@ -3,9 +3,10 @@ import { createContext, useContext, useState, useCallback } from 'react';
 const translations = {
   en: {
     appName:'PlantWise',
-    myGarden:'My Garden', addPlant:'+ Add Plant', searchPlants:'Search your plants...',
+    myGarden:'My Garden', addPlant:'Add Plant', searchPlants:'Search your plants...',
     daysGrowing:'days growing', startByAdding:'Start by adding your first plant',
     youreGrowing:"You're growing", plants:'plants', plant:'plant',
+    inYourCollection:'in your collection',
     gardenEmpty:'Your garden is empty',
     gardenEmptyDesc:'Identify a plant by name or photo and get a complete AI-powered care guide.',
     addFirstPlant:'+ Add your first plant', noMatch:'No plants match your search or filters.',
@@ -141,9 +142,10 @@ const translations = {
   },
   hi: {
     appName:'PlantWise',
-    myGarden:'मेरा बगीचा', addPlant:'+ पौधा जोड़ें', searchPlants:'अपने पौधे खोजें...',
+    myGarden:'मेरा बगीचा', addPlant:'पौधा जोड़ें', searchPlants:'अपने पौधे खोजें...',
     daysGrowing:'दिन से बढ़ रहा है', startByAdding:'अपना पहला पौधा जोड़कर शुरू करें',
     youreGrowing:'आप', plants:'पौधे उगा रहे हैं', plant:'पौधा',
+    inYourCollection:'आपके संग्रह में',
     gardenEmpty:'आपका बगीचा खाली है',
     gardenEmptyDesc:'नाम या फोटो से पौधे की पहचान करें और पूरा AI केयर गाइड पाएं।',
     addFirstPlant:'+ पहला पौधा जोड़ें', noMatch:'कोई पौधा नहीं मिला।',
@@ -275,9 +277,10 @@ const translations = {
   },
   kn: {
     appName:'PlantWise',
-    myGarden:'ನನ್ನ ತೋಟ', addPlant:'+ ಗಿಡ ಸೇರಿಸಿ', searchPlants:'ನಿಮ್ಮ ಗಿಡಗಳನ್ನು ಹುಡುಕಿ...',
+    myGarden:'ನನ್ನ ತೋಟ', addPlant:'ಗಿಡ ಸೇರಿಸಿ', searchPlants:'ನಿಮ್ಮ ಗಿಡಗಳನ್ನು ಹುಡುಕಿ...',
     daysGrowing:'ದಿನಗಳಿಂದ ಬೆಳೆಯುತ್ತಿದೆ', startByAdding:'ನಿಮ್ಮ ಮೊದಲ ಗಿಡ ಸೇರಿಸುವ ಮೂಲಕ ಪ್ರಾರಂಭಿಸಿ',
     youreGrowing:'ನೀವು', plants:'ಗಿಡಗಳನ್ನು ಬೆಳೆಸುತ್ತಿದ್ದೀರಿ', plant:'ಗಿಡ',
+    inYourCollection:'ನಿಮ್ಮ ಸಂಗ್ರಹದಲ್ಲಿ',
     gardenEmpty:'ನಿಮ್ಮ ತೋಟ ಖಾಲಿಯಾಗಿದೆ',
     gardenEmptyDesc:'ಹೆಸರು ಅಥವಾ ಫೋಟೋ ಮೂಲಕ ಗಿಡ ಗುರುತಿಸಿ ಮತ್ತು AI ಆರೈಕೆ ಮಾರ್ಗದರ್ಶಿ ಪಡೆಯಿರಿ.',
     addFirstPlant:'+ ಮೊದಲ ಗಿಡ ಸೇರಿಸಿ', noMatch:'ಯಾವುದೇ ಗಿಡ ಹೊಂದಾಣಿಕೆಯಾಗಲಿಲ್ಲ.',

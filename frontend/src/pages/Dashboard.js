@@ -10,26 +10,22 @@ import SettingsPanel from '../components/SettingsPanel';
 
 const LANG_NAMES = { en:'EN', hi:'हि', kn:'ಕ' };
 
-/* ── Monstera Leaf Logo ── */
+/* ── Plant Logo — clean sprout icon ── */
 function PlantLogo({ size=28 }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-      {/* Main leaf shape */}
-      <path d="M40 8 C20 8 10 22 12 42 C14 58 26 70 40 72 C54 70 66 58 68 42 C70 22 60 8 40 8Z"
-        fill="var(--green-mid)" opacity="0.9"/>
-      {/* Leaf holes - characteristic monstera fenestrations */}
-      <ellipse cx="30" cy="38" rx="6" ry="9" fill="var(--bg)" opacity="0.85" transform="rotate(-15 30 38)"/>
-      <ellipse cx="50" cy="38" rx="6" ry="9" fill="var(--bg)" opacity="0.85" transform="rotate(15 50 38)"/>
-      <ellipse cx="40" cy="55" rx="5" ry="7" fill="var(--bg)" opacity="0.85"/>
-      {/* Center vein */}
-      <path d="M40 12 L40 68" stroke="var(--bg)" strokeWidth="1.5" opacity="0.5" strokeLinecap="round"/>
-      {/* Side veins */}
-      <path d="M40 28 L20 20" stroke="var(--bg)" strokeWidth="1" opacity="0.4" strokeLinecap="round"/>
-      <path d="M40 28 L60 20" stroke="var(--bg)" strokeWidth="1" opacity="0.4" strokeLinecap="round"/>
-      <path d="M40 44 L16 38" stroke="var(--bg)" strokeWidth="1" opacity="0.4" strokeLinecap="round"/>
-      <path d="M40 44 L64 38" stroke="var(--bg)" strokeWidth="1" opacity="0.4" strokeLinecap="round"/>
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* Pot */}
+      <rect x="10" y="23" width="12" height="7" rx="2" fill="var(--green-mid)" opacity="0.85"/>
+      <rect x="9" y="21" width="14" height="3" rx="1.5" fill="var(--green)" opacity="0.95"/>
       {/* Stem */}
-      <path d="M40 72 L40 78" stroke="var(--green)" strokeWidth="3" strokeLinecap="round"/>
+      <path d="M16 21 L16 13" stroke="var(--green)" strokeWidth="1.8" strokeLinecap="round"/>
+      {/* Left leaf */}
+      <path d="M16 17 C16 17 10 15 9 10 C9 10 14 9 16 14" fill="var(--green-mid)" opacity="0.9"/>
+      {/* Right leaf */}
+      <path d="M16 14 C16 14 22 12 23 7 C23 7 18 6 16 11" fill="var(--green)" opacity="0.95"/>
+      {/* Top bud */}
+      <circle cx="16" cy="12" r="2.5" fill="var(--amber)" opacity="0.9"/>
+      <circle cx="16" cy="12" r="1.2" fill="var(--amber-lite)" opacity="0.85"/>
     </svg>
   );
 }
@@ -133,7 +129,7 @@ export default function Dashboard() {
           <div style={sd.divider}/>
           <button style={{...sd.btn,...sd.addBtn}} onClick={()=>setShowAdd(true)}>
             <span style={sd.addIcon}>🌱</span>
-            <span style={sd.label}>{(t.addPlant||'Add Plant').replace(/^\+\s*/,'')}</span>
+            <span style={sd.label}>{t.addPlant||'Add Plant'}</span>
           </button>
           <button style={sd.btn} onClick={()=>setShowSettings(true)}>
             <span style={sd.icon}>⚙️</span>
@@ -226,8 +222,7 @@ function HomeView({ user, plants, loading, t, tn, dc, lang, onGarden, onAdd, onP
               {plants.length===0 ? t.startByAdding : `Your garden has ${plants.length} plant${plants.length!==1?'s':''} growing`}
             </p>
             <button style={hv.heroAddBtn} onClick={onAdd}>
-              <span style={{fontSize:18}}>✦</span>
-              <span>{t.addPlant}</span>
+              <span>✦ {t.addPlant}</span>
             </button>
           </div>
 
@@ -532,9 +527,9 @@ function GardenView({ plants, loading, t, tn, dc, search, setSearch, filterDiff,
       <div style={gv.hdr} className="animate-fadeUp">
         <div>
           <h1 style={gv.title}>🪴 {t.myGarden}</h1>
-          <p style={gv.sub}>{plants.length} {plants.length!==1?t.plants:t.plant||'plant'} in your collection</p>
+          <p style={gv.sub}>{plants.length} {plants.length!==1?t.plants:t.plant||'plant'} {t.inYourCollection||'in your collection'}</p>
         </div>
-        <button className="btn btn-primary btn-sm hide-mobile" onClick={onAdd}>✦ {t.addPlant}</button>
+        <button className="btn btn-primary btn-sm hide-mobile" onClick={onAdd}>+ {t.addPlant}</button>
       </div>
 
       <div style={gv.controls} className="animate-fadeUp">
