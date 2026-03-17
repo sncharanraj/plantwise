@@ -59,6 +59,17 @@ export default function Dashboard() {
   const [search, setSearch] = useState('');
   const [filterDiff, setFilterDiff] = useState('All');
 
+  // Quote of the day — show once per day
+  const [showQuote, setShowQuote] = useState(()=>{
+    const today = new Date().toDateString();
+    const seen  = localStorage.getItem('pw_quote_seen');
+    return seen !== today; // true = show popup
+  });
+  function closeQuote(){
+    localStorage.setItem('pw_quote_seen', new Date().toDateString());
+    setShowQuote(false);
+  }
+
   useEffect(()=>{ if(user){fetchPlants();fetchNotifs();} },[user]);
   useEffect(()=>{ if(plants.length>0) translateNames(plants.map(p=>p.plant_name)); },[lang,plants.length,translateNames]);
 
@@ -186,13 +197,225 @@ export default function Dashboard() {
       {showAdd&&<AddPlantModal userId={user.id} onClose={()=>setShowAdd(false)} onPlantAdded={onPlantAdded}/>}
       {showNotifs&&<NotificationPanel notifications={notifications} userId={user.id} onClose={()=>setShowNotifs(false)} onMarkAllRead={()=>{markAllNotificationsRead(user.id);setNotifs([]);}}/>}
       {showSettings&&<SettingsPanel onClose={()=>setShowSettings(false)}/>}
+      {showQuote&&<QuoteOfDay lang={lang} onClose={closeQuote}/>}
     </div>
   );
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━
-   HOME VIEW
+   QUOTE OF THE DAY
 ━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+const QUOTES = {
+  en: [
+    { q: "Do small things with great love.", a: "Mother Teresa" },
+    { q: "Be kind, for everyone you meet is fighting a hard battle.", a: "Plato" },
+    { q: "In a world where you can be anything, be kind.", a: "Unknown" },
+    { q: "Love and kindness are never wasted.", a: "Barbara De Angelis" },
+    { q: "No act of kindness, no matter how small, is ever wasted.", a: "Aesop" },
+    { q: "We rise by lifting others.", a: "Robert Ingersoll" },
+    { q: "The best way to find yourself is to lose yourself in the service of others.", a: "Gandhi" },
+    { q: "A single act of kindness throws out roots in all directions.", a: "Amelia Earhart" },
+    { q: "Spread love everywhere you go.", a: "Mother Teresa" },
+    { q: "You cannot do a kindness too soon, for you never know how soon it will be too late.", a: "Emerson" },
+    { q: "Life is short. Be kind. Be grateful. Be present.", a: "Unknown" },
+    { q: "The greatest gift you can give someone is your time, attention, and love.", a: "Unknown" },
+    { q: "Love is not something you find. Love is something that finds you.", a: "Loretta Young" },
+    { q: "Carry out a random act of kindness with no expectation of reward.", a: "Princess Diana" },
+    { q: "Keep your face always toward the sunshine, and shadows will fall behind you.", a: "Walt Whitman" },
+    { q: "What we have once enjoyed, we can never lose.", a: "Helen Keller" },
+    { q: "The purpose of life is to contribute in some way to making things better.", a: "Robert F. Kennedy" },
+    { q: "Happiness is not something ready-made. It comes from your own actions.", a: "Dalai Lama" },
+    { q: "It always seems impossible until it's done.", a: "Nelson Mandela" },
+    { q: "Act as if what you do makes a difference. It does.", a: "William James" },
+    { q: "Love is the bridge between you and everything.", a: "Rumi" },
+    { q: "Be the change you wish to see in the world.", a: "Gandhi" },
+    { q: "Light tomorrow with today.", a: "Elizabeth Barrett Browning" },
+    { q: "Kind words cost nothing but mean everything.", a: "Unknown" },
+    { q: "There is no exercise better for the heart than reaching down and lifting people up.", a: "J. Holmes" },
+    { q: "A warm smile is the universal language of kindness.", a: "William Arthur Ward" },
+    { q: "You matter. You are loved. You are enough.", a: "Unknown" },
+    { q: "Together we can face any challenges as deep as the ocean and as high as the sky.", a: "Sonia Gandhi" },
+    { q: "One kind word can change someone's entire day.", a: "Unknown" },
+    { q: "Your life is your message to the world. Make it inspiring.", a: "Lorrin L. Lee" },
+  ],
+  hi: [
+    { q: "छोटे काम बड़े प्यार से करो।", a: "मदर टेरेसा" },
+    { q: "दयालु बनो, क्योंकि हर कोई कठिन लड़ाई लड़ रहा है।", a: "प्लेटो" },
+    { q: "जहाँ प्यार है, वहाँ ईश्वर है।", a: "महात्मा गांधी" },
+    { q: "प्यार और दयालुता कभी बर्बाद नहीं होती।", a: "बारबरा डी एंजेलिस" },
+    { q: "दूसरों को उठाकर हम खुद ऊँचे होते हैं।", a: "रॉबर्ट इंगरसॉल" },
+    { q: "खुद वो बदलाव बनो जो तुम दुनिया में देखना चाहते हो।", a: "महात्मा गांधी" },
+    { q: "जीवन का उद्देश्य दूसरों की भलाई में योगदान देना है।", a: "रॉबर्ट एफ. केनेडी" },
+    { q: "खुशी कोई तैयार चीज नहीं है। यह आपके अपने कार्यों से आती है।", a: "दलाई लामा" },
+    { q: "जो असंभव लगता है, वह हो जाता है जब इंसान ठान ले।", a: "नेल्सन मंडेला" },
+    { q: "प्यार तुम्हारे और हर चीज़ के बीच का पुल है।", a: "रूमी" },
+    { q: "एक दयालु शब्द किसी का पूरा दिन बदल सकता है।", a: "अज्ञात" },
+    { q: "आज से कल को रोशन करो।", a: "एलिजाबेथ बैरेट ब्राउनिंग" },
+    { q: "मुस्कुराहट दयालुता की सार्वभौमिक भाषा है।", a: "विलियम आर्थर वार्ड" },
+    { q: "तुम मायने रखते हो। तुम्हें प्यार किया जाता है। तुम काफी हो।", a: "अज्ञात" },
+    { q: "जिंदगी छोटी है। दयालु बनो। कृतज्ञ रहो। वर्तमान में जियो।", a: "अज्ञात" },
+    { q: "किसी को सबसे बड़ा उपहार तुम्हारा समय, ध्यान और प्यार है।", a: "अज्ञात" },
+    { q: "दयालुता की एक छोटी सी क्रिया भी व्यर्थ नहीं जाती।", a: "ईसप" },
+    { q: "हमेशा धूप की तरफ मुंह रखो, परछाईयाँ पीछे रह जाएंगी।", a: "वॉल्ट व्हिटमैन" },
+    { q: "जो हमने एक बार आनंद लिया, हम उसे कभी नहीं खो सकते।", a: "हेलन केलर" },
+    { q: "जो तुम करते हो वो फर्क पड़ता है — ऐसा मानकर काम करो।", a: "विलियम जेम्स" },
+    { q: "अपना प्यार हर जगह फैलाओ।", a: "मदर टेरेसा" },
+    { q: "दूसरों की सेवा में खुद को खोकर ही खुद को पाया जाता है।", a: "महात्मा गांधी" },
+    { q: "प्यार दोनों तरफ से बहता है — पहले दो, फिर देखो।", a: "अज्ञात" },
+    { q: "एक अच्छा काम उम्मीद के बिना करो।", a: "राजकुमारी डायना" },
+    { q: "तुम्हारी मुस्कान दुनिया को थोड़ा बेहतर बनाती है।", a: "अज्ञात" },
+    { q: "जो दिल से देता है, उसे हमेशा मिलता है।", a: "अज्ञात" },
+    { q: "इंसानियत ही सबसे बड़ा धर्म है।", a: "अज्ञात" },
+    { q: "नेकी कर, दरिया में डाल।", a: "हिंदी कहावत" },
+    { q: "दूसरों में अच्छाई ढूंढो, यह तुम्हें भी अच्छा बनाएगा।", a: "अज्ञात" },
+    { q: "तुम्हारी जिंदगी दुनिया के लिए एक संदेश है — उसे प्रेरणादायक बनाओ।", a: "अज्ञात" },
+  ],
+  kn: [
+    { q: "ಸಣ್ಣ ಕೆಲಸಗಳನ್ನು ದೊಡ್ಡ ಪ್ರೀತಿಯಿಂದ ಮಾಡಿ.", a: "ಮದರ್ ತೆರೇಸಾ" },
+    { q: "ದಯಾಳುವಾಗಿರಿ, ಏಕೆಂದರೆ ಎಲ್ಲರೂ ತಮ್ಮದೇ ಹೋರಾಟ ನಡೆಸುತ್ತಿದ್ದಾರೆ.", a: "ಪ್ಲೇಟೋ" },
+    { q: "ನೀವು ಏನಾದರೂ ಆಗಬಹುದಾದ ಜಗತ್ತಿನಲ್ಲಿ, ದಯಾಳುವಾಗಿ.", a: "ಅಜ್ಞಾತ" },
+    { q: "ಪ್ರೀತಿ ಮತ್ತು ದಯೆ ಎಂದಿಗೂ ವ್ಯರ್ಥವಾಗುವುದಿಲ್ಲ.", a: "ಬಾರ್ಬರಾ ಡಿ ಆಂಜೆಲಿಸ್" },
+    { q: "ಇತರರನ್ನು ಮೇಲೆತ್ತುವ ಮೂಲಕ ನಾವು ಮೇಲೇರುತ್ತೇವೆ.", a: "ರಾಬರ್ಟ್ ಇಂಗರ್‌ಸಾಲ್" },
+    { q: "ನೀವು ಜಗತ್ತಿನಲ್ಲಿ ನೋಡಲು ಬಯಸುವ ಬದಲಾವಣೆಯೇ ನೀವಾಗಿ.", a: "ಗಾಂಧೀಜಿ" },
+    { q: "ಪ್ರೀತಿ ನಿಮ್ಮ ಮತ್ತು ಎಲ್ಲದರ ನಡುವಿನ ಸೇತುವೆ.", a: "ರೂಮಿ" },
+    { q: "ಖುಷಿ ತಯಾರಾದ ವಸ್ತುವಲ್ಲ. ಅದು ನಿಮ್ಮ ಕ್ರಿಯೆಗಳಿಂದ ಬರುತ್ತದೆ.", a: "ದಲಾಯಿ ಲಾಮಾ" },
+    { q: "ಮುಗಿಯುವವರೆಗೆ ಅದು ಯಾವಾಗಲೂ ಅಸಾಧ್ಯವಾಗಿ ತೋರುತ್ತದೆ.", a: "ನೆಲ್ಸನ್ ಮಂಡೇಲಾ" },
+    { q: "ನೀವು ಮಾಡುವುದು ವ್ಯತ್ಯಾಸ ಮಾಡುತ್ತದೆ ಎಂದು ಭಾವಿಸಿ ಕಾರ್ಯ ಮಾಡಿ.", a: "ವಿಲಿಯಂ ಜೇಮ್ಸ್" },
+    { q: "ಒಂದು ದಯೆಯ ಮಾತು ಯಾರದೋ ಇಡೀ ದಿನವನ್ನು ಬದಲಾಯಿಸಬಲ್ಲದು.", a: "ಅಜ್ಞಾತ" },
+    { q: "ಇಂದಿನಿಂದ ನಾಳೆಯನ್ನು ಬೆಳಗಿಸಿ.", a: "ಎಲಿಜಬೆತ್ ಬ್ಯಾರೆಟ್ ಬ್ರೌನಿಂಗ್" },
+    { q: "ಮುಗುಳ್ನಗೆ ದಯೆಯ ಸಾರ್ವತ್ರಿಕ ಭಾಷೆ.", a: "ವಿಲಿಯಂ ಆರ್ಥರ್ ವಾರ್ಡ್" },
+    { q: "ನೀವು ಮುಖ್ಯ. ನಿಮ್ಮನ್ನು ಪ್ರೀತಿಸಲಾಗುತ್ತದೆ. ನೀವು ಸಾಕು.", a: "ಅಜ್ಞಾತ" },
+    { q: "ಜೀವನ ಚಿಕ್ಕದು. ದಯಾಳುವಾಗಿರಿ. ಕೃತಜ್ಞರಾಗಿರಿ. ವರ್ತಮಾನದಲ್ಲಿ ಇರಿ.", a: "ಅಜ್ಞಾತ" },
+    { q: "ಯಾರಿಗಾದರೂ ನೀಡಬಹುದಾದ ಅತ್ಯುತ್ತಮ ಉಡುಗೊರೆ ನಿಮ್ಮ ಸಮಯ ಮತ್ತು ಪ್ರೀತಿ.", a: "ಅಜ್ಞಾತ" },
+    { q: "ಪ್ರೀತಿಯನ್ನು ಎಲ್ಲೆಡೆ ಹರಡಿ.", a: "ಮದರ್ ತೆರೇಸಾ" },
+    { q: "ಇತರರ ಸೇವೆಯಲ್ಲಿ ಕಳೆದುಕೊಳ್ಳುವ ಮೂಲಕ ನಿಮ್ಮನ್ನು ಕಂಡುಕೊಳ್ಳಿ.", a: "ಗಾಂಧೀಜಿ" },
+    { q: "ಸೂರ್ಯನ ಕಡೆ ಮುಖ ಮಾಡಿ, ನೆರಳು ಹಿಂದೆ ಬೀಳುತ್ತದೆ.", a: "ವಾಲ್ಟ್ ವಿಟ್‌ಮನ್" },
+    { q: "ಒಮ್ಮೆ ಆನಂದಿಸಿದ್ದನ್ನು ನಾವು ಎಂದಿಗೂ ಕಳೆದುಕೊಳ್ಳುವುದಿಲ್ಲ.", a: "ಹೆಲೆನ್ ಕೆಲ್ಲರ್" },
+    { q: "ನಿಮ್ಮ ಜೀವನ ಜಗತ್ತಿಗೆ ಒಂದು ಸಂದೇಶ — ಅದನ್ನು ಪ್ರೇರಣಾದಾಯಕವಾಗಿ ಮಾಡಿ.", a: "ಅಜ್ಞಾತ" },
+    { q: "ಒಳ್ಳೆಯ ಕೆಲಸ ಮಾಡಿ ಮತ್ತು ಪ್ರತಿಫಲದ ನಿರೀಕ್ಷೆ ಇಡಬೇಡಿ.", a: "ರಾಜಕುಮಾರಿ ಡಯಾನಾ" },
+    { q: "ಮಾನವೀಯತೆಯೇ ಅತ್ಯುನ್ನತ ಧರ್ಮ.", a: "ಅಜ್ಞಾತ" },
+    { q: "ಇತರರಲ್ಲಿ ಒಳ್ಳೆಯದನ್ನು ಹುಡುಕಿ — ಇದು ನಿಮ್ಮನ್ನೂ ಒಳ್ಳೆಯವರನ್ನಾಗಿ ಮಾಡುತ್ತದೆ.", a: "ಅಜ್ಞಾತ" },
+    { q: "ನಿಮ್ಮ ನಗು ಜಗತ್ತನ್ನು ಸ್ವಲ್ಪ ಉತ್ತಮಗೊಳಿಸುತ್ತದೆ.", a: "ಅಜ್ಞಾತ" },
+    { q: "ಹೃದಯದಿಂದ ಕೊಡುವವನಿಗೆ ಯಾವಾಗಲೂ ಸಿಗುತ್ತದೆ.", a: "ಅಜ್ಞಾತ" },
+    { q: "ಒಟ್ಟಾಗಿ ನಾವು ಯಾವ ಸವಾಲನ್ನೂ ಎದುರಿಸಬಹುದು.", a: "ಅಜ್ಞಾತ" },
+    { q: "ಒಂದು ಸಣ್ಣ ದಯೆಯ ಕ್ರಿಯೆ ಎಂದಿಗೂ ವ್ಯರ್ಥವಾಗುವುದಿಲ್ಲ.", a: "ಈಸಾಪ್" },
+    { q: "ಪ್ರೀತಿ ಹರಿಯುತ್ತದೆ — ಮೊದಲು ನೀಡಿ, ನಂತರ ನೋಡಿ.", a: "ಅಜ್ಞಾತ" },
+    { q: "ನಿಮ್ಮ ನಡೆ ಜಗತ್ತಿಗೆ ಸ್ಫೂರ್ತಿ ನೀಡಲಿ.", a: "ಅಜ್ಞಾತ" },
+  ],
+};
+
+function QuoteOfDay({ lang, onClose }) {
+  // Pick quote based on day of year so it's consistent all day
+  const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(),0,0)) / 86400000);
+  const quotes = QUOTES[lang] || QUOTES.en;
+  const { q, a } = quotes[dayOfYear % quotes.length];
+
+  return (
+    <div style={qd.overlay} onClick={onClose}>
+      <div style={qd.card} className="animate-growIn" onClick={e=>e.stopPropagation()}>
+        {/* Decorative top accent */}
+        <div style={qd.accent}/>
+
+        {/* Quote mark */}
+        <div style={qd.bigQuote}>"</div>
+
+        {/* Label */}
+        <p style={qd.label}>✦ QUOTE OF THE DAY</p>
+
+        {/* Quote text */}
+        <p style={qd.quote}>{q}</p>
+
+        {/* Author */}
+        <p style={qd.author}>— {a}</p>
+
+        {/* Divider */}
+        <div style={qd.divider}/>
+
+        {/* Close button */}
+        <button style={qd.closeBtn} onClick={onClose}>
+          Start your day 🌱
+        </button>
+        <button style={qd.skipBtn} onClick={onClose}>✕</button>
+      </div>
+    </div>
+  );
+}
+
+const qd = {
+  overlay: {
+    position:'fixed', inset:0,
+    background:'rgba(0,0,0,0.72)',
+    backdropFilter:'blur(8px)',
+    WebkitBackdropFilter:'blur(8px)',
+    zIndex:500,
+    display:'flex', alignItems:'center', justifyContent:'center',
+    padding:24,
+  },
+  card: {
+    position:'relative',
+    background:'var(--surface)',
+    borderRadius:28,
+    padding:'48px 40px 36px',
+    width:'100%',
+    maxWidth:480,
+    boxShadow:'0 32px 80px rgba(0,0,0,0.4), 0 0 0 1px var(--border-2)',
+    textAlign:'center',
+    overflow:'hidden',
+  },
+  accent: {
+    position:'absolute', top:0, left:0, right:0, height:4,
+    background:'var(--grad-accent)',
+  },
+  bigQuote: {
+    fontFamily:"'DM Serif Display',Georgia,serif",
+    fontSize:120, lineHeight:0.7,
+    color:'var(--green-glow)',
+    marginBottom:16,
+    userSelect:'none',
+    color:'var(--border-2)',
+  },
+  label: {
+    fontSize:11, fontWeight:700, letterSpacing:'0.12em',
+    color:'var(--green-mid)', marginBottom:20,
+    textTransform:'uppercase',
+  },
+  quote: {
+    fontFamily:"'DM Serif Display',Georgia,serif",
+    fontSize:26, fontWeight:400, fontStyle:'italic',
+    color:'var(--text-1)', lineHeight:1.55,
+    marginBottom:20,
+    letterSpacing:'-0.01em',
+  },
+  author: {
+    fontSize:14, color:'var(--text-3)',
+    fontWeight:500, letterSpacing:'0.02em',
+    marginBottom:28,
+  },
+  divider: {
+    height:1, background:'var(--border)',
+    marginBottom:24, marginLeft:40, marginRight:40,
+  },
+  closeBtn: {
+    display:'inline-flex', alignItems:'center', gap:8,
+    padding:'13px 32px',
+    background:'var(--grad-accent)',
+    color:'#fff', border:'none',
+    borderRadius:100, cursor:'pointer',
+    fontSize:15, fontWeight:600,
+    fontFamily:"'Plus Jakarta Sans',sans-serif",
+    boxShadow:'0 4px 20px rgba(82,183,136,0.4)',
+    transition:'all 0.2s',
+    width:'100%', justifyContent:'center',
+    marginBottom:12,
+  },
+  skipBtn: {
+    background:'none', border:'none',
+    cursor:'pointer', color:'var(--text-3)',
+    fontSize:13, fontWeight:500,
+    fontFamily:"'Plus Jakarta Sans',sans-serif",
+    padding:'4px 8px',
+  },
+};
 function HomeView({ user, plants, loading, t, tn, dc, lang, onGarden, onAdd, onPlantClick, onWater, wateringId, onDelete }) {
   const hour = new Date().getHours();
   const greet = hour<5?'Good night 🌙':hour<12?'Good morning 🌅':hour<17?'Good afternoon ☀️':hour<21?'Good evening 🌆':'Good night 🌙';
